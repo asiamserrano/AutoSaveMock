@@ -20,7 +20,7 @@
     <entity name="Property" representedClassName="Property" parentEntity="Identifier" syncable="YES">
         <attribute name="device_enum_str" attributeType="String"/>
         <attribute name="type_enum_str" attributeType="String"/>
-        <attribute name="value_str" optional="YES" attributeType="String"/>
+        <attribute name="value_str" attributeType="String"/>
         <relationship name="bucket_set" toMany="YES" deletionRule="Nullify" destinationEntity="Device" inverseName="bucket_set" inverseEntity="Device"/>
         <relationship name="platform" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Device"/>
     </entity>

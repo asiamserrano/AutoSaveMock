@@ -8,12 +8,9 @@
 import Foundation
 
 
-// library, wishlist, statistics
-// game, platform, property
-// owned, unowned
+// MARK: - LeafProtocols
 
-
-public enum MenuEnum: EnumProtocol {
+public enum MenuEnum: LeafProtocol {
     case library, wishlist, statistics
     
     var icon: String {
@@ -29,7 +26,7 @@ public enum MenuEnum: EnumProtocol {
     
 }
 
-public enum DeviceEnum: EnumProtocol {
+public enum DeviceEnum: LeafProtocol {
     case game, platform
 
     public var display: String {
@@ -43,76 +40,15 @@ public enum DeviceEnum: EnumProtocol {
 
 }
 
-public enum StatusEnum: EnumProtocol {
+public enum PropertyEnum: LeafProtocol {
+    case input, selection, format
+}
+
+public enum StatusEnum: LeafProtocol {
     case owned, unowned
 }
 
-// MARK: - SECTION
-
-public enum PhysicalEnum: EnumProtocol {
-    case disc, cartridge
-}
-
-public enum DigitalEnum: EnumProtocol {
-    case inner, steam, origin, psn, xbox, nintendo
-    
-    public var display: String {
-        switch self {
-        case .inner:
-            return "Internal Storage"
-        case .psn:
-            return "Playstation Network"
-        case .xbox:
-            return "Xbox Live"
-        case .nintendo:
-            return "Nintendo eShop"
-        default:
-            return Self.getDisplay(self)
-        }
-    }
-    
-}
-
-public enum FormatEnum: EnumProtocol {
-    
-    public static var allCases: [FormatEnum] {
-        DigitalEnum.allCases.map(Self.digital) +
-        PhysicalEnum.allCases.map(Self.physical)
-    }
-    
-    case digital(DigitalEnum)
-    case physical(PhysicalEnum)
-    
-    public var id: String {
-        switch self {
-        case .physical(let physical):
-            return physical.id
-        case .digital(let digital):
-            return digital.id
-        }
-    }
-    
-    public var display: String {
-        switch self {
-        case .physical(let physical):
-            return physical.display
-        case .digital(let digital):
-            return digital.display
-        }
-    }
-    
-    public var icon: String {
-        switch self {
-        case .physical(_):
-            return "opticaldisc.fill"
-        case .digital(_):
-            return "arrow.down.circle.fill"
-        }
-    }
-    
-}
-
-public enum ModeEnum: EnumProtocol {
+public enum ModeEnum: LeafProtocol {
     case single, coop, multi
 
     public var display: String {
@@ -139,7 +75,7 @@ public enum ModeEnum: EnumProtocol {
     
 }
 
-public enum TypeEnum: EnumProtocol {
+public enum TypeEnum: LeafProtocol {
     case console, handheld, hybrid, os
 
     public var display: String {
@@ -152,37 +88,10 @@ public enum TypeEnum: EnumProtocol {
     }
 }
 
-public enum SelectionEnum: EnumProtocol {
-    
-    public static var allCases: [SelectionEnum] {
-        ModeEnum.allCases.map(Self.mode) +
-        TypeEnum.allCases.map(Self.type)
-    }
-    
-    case mode(ModeEnum)
-    case type(TypeEnum)
-    
-    public var id: String {
-        switch self {
-        case .mode(let mode):
-            return mode.id
-        case .type(let type):
-            return type.id
-        }
-    }
-    
-    public var display: String {
-        switch self {
-        case .mode(let mode):
-            return mode.display
-        case .type(let type):
-            return type.display
-        }
-    }
 
-}
+// MARK: - BranchProtocols
 
-public enum InputEnum: TriadProtocol {
+public enum InputEnum: BranchProtocol {
     
     case developer(String)
     case genre(String)
@@ -198,66 +107,176 @@ public enum InputEnum: TriadProtocol {
         case .abbrv:
             return "Abbreviation"
         default:
+            return self.id.capitalized
+        }
+    }
+    
+    public var value: String {
+        var str: String {
+            switch self {
+            case .developer(let string):
+                return string
+            case .genre(let string):
+                return string
+            case .family(let string):
+                return string
+            case .series(let string):
+                return string
+            case .manufacturer(let string):
+                return string
+            case .publisher(let string):
+                return string
+            case .generation(let string):
+                return string
+            case .abbrv(let string):
+                return string
+            }
+        }
+        
+        return str.trimmed
+    }
+    
+    public var parent: PropertyEnum {
+        .input
+    }
+    
+    public var singular: Bool {
+        switch self {
+        case .family, .series, .generation, .abbrv:
+            return true
+        default:
+            return false
+        }
+    }
+
+}
+
+public enum SelectionEnum: BranchProtocol {
+    case mode(ModeEnum)
+    case type(TypeEnum)
+    
+    public var value: String {
+        switch self {
+        case .mode(let mode):
+            return mode.id
+        case .type(let type):
+            return type.id
+        }
+    }
+    
+    public var parent: PropertyEnum {
+        .selection
+    }
+    
+    public var singular: Bool {
+        switch self {
+        case .mode:
+            return false
+        case .type:
+            return true
+        }
+    }
+
+}
+
+public enum FormatEnum: BranchProtocol {
+    case digital(DigitalEnum)
+    case physical(PhysicalEnum)
+
+    public var value: String {
+        switch self {
+        case .digital(let digital):
+            return digital.id
+        case .physical(let physical):
+            return physical.id
+        }
+    }
+
+    public var icon: String {
+        switch self {
+        case .physical:
+            return "opticaldisc.fill"
+        case .digital:
+            return "arrow.down.circle.fill"
+        }
+    }
+    
+    public var parent: PropertyEnum {
+        .format
+    }
+
+}
+
+public enum PhysicalEnum: BranchProtocol {
+    
+    case disc(Device)
+    case cartridge (Device)
+    
+    public var platform: Device? {
+        switch self {
+        case .disc(let device):
+            return device
+        case .cartridge(let device):
+            return device
+        }
+    }
+    
+    public var value: String {
+        FormatEnum.physical(self).value
+    }
+    
+    public var parent: PropertyEnum {
+        FormatEnum.physical(self).parent
+    }
+    
+}
+
+public enum DigitalEnum: BranchProtocol {
+    case inner(Device)
+    case steam(Device)
+    case origin(Device)
+    case psn(Device)
+    case xbox(Device)
+    case nintendo(Device)
+    
+    public var display: String {
+        switch self {
+        case .inner:
+            return "Internal Storage"
+        case .psn:
+            return "Playstation Network"
+        case .xbox:
+            return "Xbox Live"
+        case .nintendo:
+            return "Nintendo eShop"
+        default:
             return Self.getDisplay(self)
         }
     }
     
-    public var id: String {
-        String(describing: self).
-        replacingOccurrences(of: "(?:\("\\("))(.*?)(?:\(subString2))",
-                             with: replacement, options: .regularExpression)
+    public var platform: Device? {
+        switch self {
+        case .inner(let device):
+            return device
+        case .steam(let device):
+            return device
+        case .origin(let device):
+            return device
+        case .psn(let device):
+            return device
+        case .xbox(let device):
+            return device
+        case .nintendo(let device):
+            return device
+        }
     }
     
-//    public var isSingular: Bool {
-//        switch self {
-//        case .family, .series, .generation, .abbrv:
-//            return true
-//        default:
-//            return false
-//        }
-//    }
-
+    public var value: String {
+        FormatEnum.digital(self).value
+    }
+    
+    public var parent: PropertyEnum {
+        FormatEnum.digital(self).parent
+    }
+    
 }
-
-
-
-//public enum PropertyTypeEnum: EnumProtocol {
-//
-//    public static var allCases: [PropertyTypeEnum] {
-//        InputEnum.allCases.map(Self.input) +
-//        SelectionEnum.allCases.map(Self.selection) +
-//        FormatEnum.allCases.map(Self.format)
-//    }
-//
-//    case input(InputEnum)
-//    case selection(SelectionEnum)
-//    case format(FormatEnum)
-//
-//    public var id: String {
-//        switch self {
-//        case .input(let input):
-//            return input.id
-//        case .selection(let selection):
-//            return selection.id
-//        case .format(let format):
-//            return format.id
-//        }
-//    }
-//
-//    public var display: String {
-//        switch self {
-//        case .input(let input):
-//            return input.display
-//        case .selection(let selection):
-//            return selection.display
-//        case .format(let format):
-//            return format.display
-//        }
-//    }
-//
-//}
-//
-//public enum PropertyEnum: EnumProtocol {
-//    case input, mode, type, digital, physical
-//}
-

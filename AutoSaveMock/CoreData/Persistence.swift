@@ -30,6 +30,27 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
+        /*
+         @NSManaged public var device_enum_str: String?
+         @NSManaged public var type_enum_str: String?
+         @NSManaged public var value_str: String?
+         @NSManaged public var bucket_set: NSSet?
+         @NSManaged public var platform: Device?
+         */
+        
+        
+        [
+            Property.Builder(input: .developer("Rockstar Games"), .game),
+            Property.Builder(type: .console),
+            Property.Builder(mode: .single)
+            
+        ].forEach { item in
+            item.build(viewContext)
+        }
+        
+        
+        
+        
         return result
     }()
     

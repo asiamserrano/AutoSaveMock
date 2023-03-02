@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import SwiftUI
 
 @objc(Device)
 public class Device: Identifier {
@@ -79,3 +80,140 @@ extension Device {
 
 }
 
+extension Device {
+    
+    public class Builder: TriadProtocol {
+        public let released: Date
+        public let name: String
+        public let uiimage: UIImage
+        public let added: Date
+        public let deviceEnum: DeviceEnum
+        public let statusEnum: StatusEnum
+        
+        let settings = makeSettings {}
+
+        
+        public var id: String {
+            [
+                self.name,
+                self.released.dashless,
+                self.statusEnum.id,
+                self.deviceEnum.id
+            ].id
+        }
+        
+        private init(_ status: StatusEnum, _ device: DeviceEnum) {
+            self.deviceEnum = device
+            self.statusEnum = status
+            self.released = Date.today
+            self.name = String.empty
+            self.uiimage = UIImage.empty
+            self.added = Date.today
+        }
+        
+//        public class Game: Builder {
+//            let modes: Set<ModeEnum> = []
+//            let formats: Set<FormatEnum>  = []
+//            let series: InputEnum? = nil
+//            let developers: Set<InputEnum> = []
+//            let publishers: Set<InputEnum> = []
+//            let genres: Set<InputEnum> = []
+//
+//        }
+        
+        
+    }
+    
+    
+    
+}
+//
+//enum Foobar {
+//    case a(String?)
+//    
+//    var value:
+//}
+//
+//struct Setting {
+//    var name: Name
+//    var value: Value
+//}
+//
+//extension Setting {
+//    
+//    enum Name {
+//        case series, developers, publishers, genres, modes, formats
+//    }
+//    
+//    enum Value {
+//        case string(String)
+//        case array([String])
+//    }
+//}
+//
+//@resultBuilder
+//struct SettingsBuilder {
+//    static func buildBlock() -> [Setting] { [] }
+//    
+//}
+//
+//struct SettingsGroup {
+//    var name: Setting.Name
+//    var settings: [Setting]
+//
+//    init(name: Setting.Name,
+//         @SettingsBuilder builder: () -> [Setting]) {
+//        self.name = name
+//        self.settings = builder()
+//    }
+//}
+//
+//extension SettingsBuilder {
+//    static func buildBlock(_ settings: Setting...) -> [Setting] {
+//        settings
+//    }
+//}
+//
+//func makeSettings(@SettingsBuilder _ content: () -> [Setting]) -> [Setting] {
+//    content()
+//}
+//
+//protocol SettingsConvertible {
+//    func asSettings() -> [Setting]
+//}
+//
+//extension Setting: SettingsConvertible {
+//    func asSettings() -> [Setting] { [self] }
+//}
+//
+//extension SettingsBuilder {
+//    static func buildBlock(_ values: SettingsConvertible...) -> [Setting] {
+//        values.flatMap { $0.asSettings() }
+//    }
+//}
+//
+//extension Array: SettingsConvertible where Element == Setting {
+//    func asSettings() -> [Setting] { self }
+//}
+//
+//extension SettingsBuilder {
+//    static func buildIf(_ value: SettingsConvertible?) -> SettingsConvertible {
+//        value ?? []
+//    }
+//}
+//
+//extension SettingsBuilder {
+//    static func buildEither(first: SettingsConvertible) -> SettingsConvertible {
+//        first
+//    }
+//
+//    static func buildEither(second: SettingsConvertible) -> SettingsConvertible {
+//        second
+//    }
+//}
+//
+//extension Setting {
+//    struct Empty: SettingsConvertible {
+//        func asSettings() -> [Setting] { [] }
+//    }
+//}

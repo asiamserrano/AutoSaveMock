@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol EnumProtocol: TriadProtocol, CaseIterable, Comparable {
+public protocol EnumProtocol: TriadProtocol {
     
     var display: String { get }
     
@@ -18,33 +18,51 @@ public extension EnumProtocol {
     static func getDisplay(_ s: Self) -> String {
         s.id.capitalized
     }
-
-    var id: String { String(describing: self) }
+    
+    var id: String {
+        String(describing: self)
+            .replacingOccurrences(of: "(?:\\()(.*?)(?:\\))",
+                                  with: String.empty, options: .regularExpression)
+    }
     
     var display: String { Self.getDisplay(self) }
-    
-    init(_ str: String) {
-        self =  Self.allCases.first(where: { $0.id == str })!
-    }
     
     var random: String {
         "\(self.display) \(String(format: "%04d", Int.random(in: 0...9999)))"
     }
     
-//    var index: Self.AllCases.Index {
-//        Self.allCases.firstIndex(of: self)!
-//    }
+}
+
+
+public protocol LeafProtocol: EnumProtocol, CaseIterable {
     
-//    func equals(_ other: String) -> Bool {
-//        self.id === other || self.display === other
-//    }
-//
-//    static func < (lhs: Self, rhs: Self) -> Bool {
-//        lhs.index < rhs.index
-//    }
-//
-//    static func == (lhs: Self, rhs: String) -> Bool {
-//        lhs.id === rhs
-//    }
+    init(_ str: String)
+    
+}
+
+public extension LeafProtocol {
+    
+    init(_ str: String) {
+        self = Self.allCases.first(where: { $0.id == str })!
+    }
+    
+}
+
+
+public protocol BranchProtocol: EnumProtocol {
+    
+    var value: String { get }
+    var parent: PropertyEnum { get }
+    var platform: Device? { get }
+    
+}
+
+public extension BranchProtocol {
+    
+    var identity: Int {
+        [ self.id, self.value ].id.hashed
+    }
+    
+    var platform: Device? { nil }
     
 }

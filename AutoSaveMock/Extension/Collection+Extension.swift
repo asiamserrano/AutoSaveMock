@@ -10,7 +10,10 @@ import Foundation
 extension Collection where Element == String {
     
     public var id: String {
-        Set(self.map { $0.hashed }).sorted().description
+        Set(self.map { $0.hashed })
+            .filter { $0 != 5381 }
+            .sorted()
+            .description
     }
 
 }
