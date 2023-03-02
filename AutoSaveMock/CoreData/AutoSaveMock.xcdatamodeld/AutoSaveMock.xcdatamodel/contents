@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Device" representedClassName="Device" parentEntity="Identifier" syncable="YES">
+        <attribute name="add_dt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="image_bd" optional="YES" attributeType="Binary"/>
+        <attribute name="name_str" attributeType="String"/>
+        <attribute name="release_dt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="status_enum_str" attributeType="String"/>
+        <relationship name="bucket_set" toMany="YES" deletionRule="Nullify" destinationEntity="Property" inverseName="bucket_set" inverseEntity="Property"/>
+    </entity>
+    <entity name="Identifier" representedClassName="Identifier" isAbstract="YES" syncable="YES">
+        <attribute name="identity" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="identity_enum_str" attributeType="String"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="identity"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Property" representedClassName="Property" parentEntity="Identifier" syncable="YES">
+        <attribute name="device_enum_str" attributeType="String"/>
+        <attribute name="type_enum_str" attributeType="String"/>
+        <attribute name="value_str" optional="YES" attributeType="String"/>
+        <relationship name="bucket_set" toMany="YES" deletionRule="Nullify" destinationEntity="Device" inverseName="bucket_set" inverseEntity="Device"/>
+        <relationship name="platform" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Device"/>
+    </entity>
+</model>

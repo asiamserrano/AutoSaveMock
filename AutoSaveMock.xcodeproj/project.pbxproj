@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E102D9829B01B4700C7D4F1 /* Collection+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E102D9729B01B4700C7D4F1 /* Collection+Extension.swift */; };
+		1E102D9A29B0210200C7D4F1 /* Image+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E102D9929B0210200C7D4F1 /* Image+Extension.swift */; };
+		1E24794D29AFE286003A3D99 /* Property+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24794729AFE286003A3D99 /* Property+CoreData.swift */; };
+		1E24795629AFF00A003A3D99 /* Identifier+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24795429AFF00A003A3D99 /* Identifier+CoreData.swift */; };
+		1E24795929AFF085003A3D99 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24795829AFF085003A3D99 /* String+Extension.swift */; };
+		1E24795B29AFF696003A3D99 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24795A29AFF696003A3D99 /* Date+Extension.swift */; };
+		1E24795D29AFF77E003A3D99 /* Int+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24795C29AFF77E003A3D99 /* Int+Extension.swift */; };
+		1E24796029AFFC88003A3D99 /* Triad+Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24795F29AFFC88003A3D99 /* Triad+Protocol.swift */; };
+		1E24796229B006B1003A3D99 /* Enum+Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24796129B006B1003A3D99 /* Enum+Protocol.swift */; };
+		1E24796529B007B4003A3D99 /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24796429B007B4003A3D99 /* Enumeration.swift */; };
+		1E24796829B0092D003A3D99 /* Device+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24796629B0092D003A3D99 /* Device+CoreData.swift */; };
 		6269E2EE29AFD7DF00A8DF47 /* AutoSaveMockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */; };
 		6269E2F029AFD7DF00A8DF47 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */; };
 		6269E2F229AFD7EA00A8DF47 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6269E2F129AFD7EA00A8DF47 /* Assets.xcassets */; };
@@ -16,6 +27,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1E102D9729B01B4700C7D4F1 /* Collection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extension.swift"; sourceTree = "<group>"; };
+		1E102D9929B0210200C7D4F1 /* Image+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extension.swift"; sourceTree = "<group>"; };
+		1E24794729AFE286003A3D99 /* Property+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Property+CoreData.swift"; sourceTree = "<group>"; };
+		1E24795429AFF00A003A3D99 /* Identifier+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identifier+CoreData.swift"; sourceTree = "<group>"; };
+		1E24795829AFF085003A3D99 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		1E24795A29AFF696003A3D99 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		1E24795C29AFF77E003A3D99 /* Int+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extension.swift"; sourceTree = "<group>"; };
+		1E24795F29AFFC88003A3D99 /* Triad+Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Triad+Protocol.swift"; sourceTree = "<group>"; };
+		1E24796129B006B1003A3D99 /* Enum+Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Enum+Protocol.swift"; sourceTree = "<group>"; };
+		1E24796429B007B4003A3D99 /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
+		1E24796629B0092D003A3D99 /* Device+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Device+CoreData.swift"; sourceTree = "<group>"; };
 		6269E2EA29AFD7DF00A8DF47 /* AutoSaveMock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoSaveMock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSaveMockApp.swift; sourceTree = "<group>"; };
 		6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -36,6 +58,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1E24794429AFDFA7003A3D99 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		1E24794529AFDFC3003A3D99 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				1E24795429AFF00A003A3D99 /* Identifier+CoreData.swift */,
+				1E24796629B0092D003A3D99 /* Device+CoreData.swift */,
+				1E24794729AFE286003A3D99 /* Property+CoreData.swift */,
+				6269E2F829AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld */,
+				6269E2F629AFD7EA00A8DF47 /* Persistence.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		1E24795729AFF074003A3D99 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				1E102D9729B01B4700C7D4F1 /* Collection+Extension.swift */,
+				1E24795829AFF085003A3D99 /* String+Extension.swift */,
+				1E24795A29AFF696003A3D99 /* Date+Extension.swift */,
+				1E24795C29AFF77E003A3D99 /* Int+Extension.swift */,
+				1E102D9929B0210200C7D4F1 /* Image+Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		1E24795E29AFFC73003A3D99 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				1E24795F29AFFC88003A3D99 /* Triad+Protocol.swift */,
+				1E24796129B006B1003A3D99 /* Enum+Protocol.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
 		6269E2E129AFD7DE00A8DF47 = {
 			isa = PBXGroup;
 			children = (
@@ -56,10 +119,12 @@
 			isa = PBXGroup;
 			children = (
 				6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */,
-				6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */,
+				1E24796429B007B4003A3D99 /* Enumeration.swift */,
+				1E24795E29AFFC73003A3D99 /* Protocol */,
+				1E24795729AFF074003A3D99 /* Extension */,
+				1E24794529AFDFC3003A3D99 /* CoreData */,
+				1E24794429AFDFA7003A3D99 /* View */,
 				6269E2F129AFD7EA00A8DF47 /* Assets.xcassets */,
-				6269E2F629AFD7EA00A8DF47 /* Persistence.swift */,
-				6269E2F829AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld */,
 				6269E2F329AFD7EA00A8DF47 /* Preview Content */,
 			);
 			path = AutoSaveMock;
@@ -143,10 +208,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E24796229B006B1003A3D99 /* Enum+Protocol.swift in Sources */,
+				1E102D9829B01B4700C7D4F1 /* Collection+Extension.swift in Sources */,
+				1E24796529B007B4003A3D99 /* Enumeration.swift in Sources */,
+				1E24795929AFF085003A3D99 /* String+Extension.swift in Sources */,
 				6269E2F729AFD7EA00A8DF47 /* Persistence.swift in Sources */,
+				1E102D9A29B0210200C7D4F1 /* Image+Extension.swift in Sources */,
 				6269E2F029AFD7DF00A8DF47 /* ContentView.swift in Sources */,
+				1E24796829B0092D003A3D99 /* Device+CoreData.swift in Sources */,
+				1E24794D29AFE286003A3D99 /* Property+CoreData.swift in Sources */,
 				6269E2EE29AFD7DF00A8DF47 /* AutoSaveMockApp.swift in Sources */,
+				1E24795D29AFF77E003A3D99 /* Int+Extension.swift in Sources */,
+				1E24795629AFF00A003A3D99 /* Identifier+CoreData.swift in Sources */,
 				6269E2FA29AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld in Sources */,
+				1E24795B29AFF696003A3D99 /* Date+Extension.swift in Sources */,
+				1E24796029AFFC88003A3D99 /* Triad+Protocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,8 +357,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -310,8 +386,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
