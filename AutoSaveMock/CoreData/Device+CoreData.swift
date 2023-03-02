@@ -90,7 +90,7 @@ extension Device {
         public let deviceEnum: DeviceEnum
         public let statusEnum: StatusEnum
         
-        let settings = makeSettings {}
+//        let settings = makeSettings {}
 
         
         public var id: String {
@@ -130,7 +130,7 @@ extension Device {
 //
 //enum Foobar {
 //    case a(String?)
-//    
+//
 //    var value:
 //}
 //
@@ -140,11 +140,11 @@ extension Device {
 //}
 //
 //extension Setting {
-//    
+//
 //    enum Name {
 //        case series, developers, publishers, genres, modes, formats
 //    }
-//    
+//
 //    enum Value {
 //        case string(String)
 //        case array([String])
@@ -154,7 +154,7 @@ extension Device {
 //@resultBuilder
 //struct SettingsBuilder {
 //    static func buildBlock() -> [Setting] { [] }
-//    
+//
 //}
 //
 //struct SettingsGroup {
