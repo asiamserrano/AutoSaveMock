@@ -33,4 +33,8 @@ extension String {
         left = right.trimmed
     }
     
+    public var isEmpty: Bool {
+        self.stripped.count == 0
+    }
+    
 }

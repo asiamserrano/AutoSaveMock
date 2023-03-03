@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol EnumProtocol: TriadProtocol {
+public protocol EnumProtocol: TriadProtocol, CaseIterable {
     
     var display: String { get }
     
@@ -19,50 +19,19 @@ public extension EnumProtocol {
         s.id.capitalized
     }
     
-    var id: String {
-        String(describing: self)
-            .replacingOccurrences(of: "(?:\\()(.*?)(?:\\))",
-                                  with: String.empty, options: .regularExpression)
+    init(_ str: String) {
+        self = str.isEmpty ? Self.allCases.first! : Self.allCases.first(where: { $0.id == str } )!
     }
     
+    var id: String { String(describing: self) }
     var display: String { Self.getDisplay(self) }
     
     var random: String {
         "\(self.display) \(String(format: "%04d", Int.random(in: 0...9999)))"
     }
     
-}
-
-
-public protocol LeafProtocol: EnumProtocol, CaseIterable {
-    
-    init(_ str: String)
-    
-}
-
-public extension LeafProtocol {
-    
-    init(_ str: String) {
-        self = Self.allCases.first(where: { $0.id == str })!
+    static func contains(_ str: String) -> Bool {
+        Self.allCases.map { $0.id }.contains(str)
     }
-    
-}
-
-
-public protocol BranchProtocol: EnumProtocol {
-    
-    var value: String { get }
-    var parent: PropertyEnum { get }
-    var platform: Device? { get }
-    
-}
-
-public extension BranchProtocol {
-    
-    var identity: Int {
-        [ self.id, self.value ].id.hashed
-    }
-    
-    var platform: Device? { nil }
     
 }

@@ -12,6 +12,10 @@ import CoreData
 @objc(Identifier)
 public class Identifier: NSManagedObject {
 
+    public var identity_enum: String {
+        self.identity_enum_str ?? .empty
+    }
+    
 }
 
 extension Identifier: Identifiable {

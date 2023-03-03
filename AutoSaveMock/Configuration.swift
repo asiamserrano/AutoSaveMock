@@ -11,4 +11,8 @@ import CoreData
 
 public typealias MOC = NSManagedObjectContext
 
-public typealias BranchObject = any BranchProtocol
+public typealias InputTuple = (inputEnum: InputEnum, value: String, deviceEnum: DeviceEnum)
+public typealias DigitalTuple = (digitalEnum: DigitalEnum, platform: Device)
+public typealias PhysicalTuple = (physicalEnum: PhysicalEnum, platform: Device)
+//public typealias FormatTuples = Set<FormatTuple>
+

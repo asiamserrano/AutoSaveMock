@@ -15,6 +15,10 @@ extension Collection where Element == String {
             .sorted()
             .description
     }
+    
+    public func contains(_ element: String) -> Bool {
+        self.map { $0 == element }.contains(true)
+    }
 
 }
 

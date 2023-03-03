@@ -23,4 +23,8 @@ extension Int {
         String(format: "%04d", self)
     }
     
+    public var int64: Int64 {
+        Int64(self)
+    }
+    
 }

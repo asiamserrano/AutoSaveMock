@@ -26,11 +26,15 @@ extension MOC {
         }
     }
         
-//    public func remove(_ object: NSManagedObject) -> Void {
-//        self.delete(object)
-//        self.store()
-//        if let _: Device = object as? Device { self.clean() }
-//    }
+    public func remove(_ object: NSManagedObject) -> Void {
+        self.delete(object)
+        self.store()
+        if let _: Device = object as? Device { self.clean() }
+    }
+    
+    private func clean() -> Void {
+        self.createFetchRequest(.Property).filter { ($0 as! Property).devices.isEmpty }.forEach(self.remove)
+    }
         
     private func executeFetchRequest(_ fetchRequest: NSFetchRequest<NSManagedObject>) -> ManagedObjects {
         (try? self.fetch(fetchRequest)) ?? []
@@ -55,7 +59,7 @@ extension MOC {
         }
         
         let property: Property = Property(context: self)
-        property.identity = Int64(builder.identity)
+        property.identity = builder.identity.int64
         property.identity_enum_str = builder.propertyEnum.id
         property.device_enum_str = builder.deviceEnum.id
         property.type_enum_str = builder.type
@@ -65,6 +69,43 @@ extension MOC {
         
         self.store()
         return property
+    }
+    
+    public func build(_ builder: Device.Builder, _ d: Device? = nil) -> Device {
+        let device: Device = d ?? Device(context: self)
+        device.identity = builder.identity.int64
+        device.identity_enum_str = builder.deviceEnum.id
+        device.name_str = builder.name
+        device.add_dt = builder.added
+        device.release_dt = builder.release
+        device.status_enum_str = builder.statusEnum.id
+        device.image_bd = builder.uiimage.data
+        device.bucket_set = NSSet(array: builder.container.values.map { self.build($0) })
+        
+        self.store()
+        if d != nil { self.clean() }
+        return device
+    }
+    
+    public func getDevice(_ builder: Device.Builder) -> Device? {
+        if let first: NSManagedObject = self.createFetchRequest(.Device, builder.identity).first {
+            if let device: Device = first as? Device {
+                return device
+            }
+        }
+        
+        return nil
+    }
+    
+    public func filterProperties(_ device: DeviceEnum, _ type_str: String) -> [Property] {
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Property")
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "type_enum_str == %@", type_str),
+            NSPredicate(format: "device_enum_str == %@", device.id)
+        ])
+        
+        return self.executeFetchRequest(fetchRequest).map { $0 as! Property }
+        
     }
     
 }
