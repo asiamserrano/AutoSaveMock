@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 import CoreData
 
+public let appScreenWidth: CGFloat = UIScreen.main.bounds.width
+public let appScreenHeight: CGFloat = UIScreen.main.bounds.height
+
 public typealias MOC = NSManagedObjectContext
 
 public typealias InputTuple = (inputEnum: InputEnum, value: String, deviceEnum: DeviceEnum)

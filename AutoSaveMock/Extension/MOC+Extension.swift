@@ -75,7 +75,7 @@ extension MOC {
         let device: Device = d ?? Device(context: self)
         device.identity = builder.identity.int64
         device.identity_enum_str = builder.deviceEnum.id
-        device.name_str = builder.name
+        device.name_str = builder.name.trimmed
         device.add_dt = builder.added
         device.release_dt = builder.release
         device.status_enum_str = builder.statusEnum.id
@@ -105,6 +105,28 @@ extension MOC {
         ])
         
         return self.executeFetchRequest(fetchRequest).map { $0 as! Property }
+        
+    }
+    
+    public func getDevices(_ device: DeviceEnum, _ status: StatusEnum? = nil) -> [Device] {
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Device")
+        let pred: NSPredicate = NSPredicate(format: "identity_enum_str == %@", device.id)
+        
+        var fetchPredicate: NSPredicate {
+            if let s: StatusEnum = status {
+                return NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    pred,
+                    NSPredicate(format: "status_enum_str == %@", s.id)
+                ])
+            } else {
+                return pred
+            }
+        }
+        
+        
+        fetchRequest.predicate = fetchPredicate
+        
+        return self.executeFetchRequest(fetchRequest).map { $0 as! Device }
         
     }
     

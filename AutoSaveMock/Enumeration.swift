@@ -7,6 +7,19 @@
 
 import Foundation
 
+public enum ViewEnum: EnumProtocol {
+    case list, icons
+    
+    var icon: String {
+        switch self {
+        case .list:
+            return "list.bullet"
+        case .icons:
+            return "square.grid.2x2"
+        }
+    }
+    
+}
 
 public enum MenuEnum: EnumProtocol {
     case library, wishlist, statistics
@@ -24,6 +37,19 @@ public enum MenuEnum: EnumProtocol {
     
 }
 
+public enum SortEnum: EnumProtocol {
+    case name, release
+    
+    public var display: String {
+        switch self {
+        case .release:
+            return "Release Date"
+        default:
+            return Self.getDisplay(self)
+        }
+    }
+}
+
 public enum DeviceEnum: EnumProtocol {
     case game, platform
 
@@ -33,6 +59,15 @@ public enum DeviceEnum: EnumProtocol {
             return "Video Game"
         default:
             return Self.getDisplay(self)
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .game:
+            return "gamecontroller.fill"
+        case .platform:
+            return "tv.and.mediabox.fill"
         }
     }
 

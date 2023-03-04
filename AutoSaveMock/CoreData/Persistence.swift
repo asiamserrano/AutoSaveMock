@@ -30,28 +30,48 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        /*
-         @NSManaged public var device_enum_str: String?
-         @NSManaged public var type_enum_str: String?
-         @NSManaged public var value_str: String?
-         @NSManaged public var bucket_set: NSSet?
-         @NSManaged public var platform: Device?
-         */
+        var platforms: [Device] = []
         
-//        PlatformBuilder()
-//            .setName("\(DeviceEnum.platform.display) \(id)")
-//            .setReleased(Date.random)
-//            .setType(TypeEnum.allCases.randomElement()!)
-//            .setAbbrv(getProperty(.abbrv, .platform))
-//            .setFamily(getProperty(.family, .platform))
-//            .setGeneration(Int(getProperty(.generation, .platform))!)
-//            .addManufacturer(getProperty(.manufacturer, .platform))
-//            .addDeveloper(getProperty(.developer, .platform))
-//            .build(viewContext)
+        for x in 0..<15 {
+            
+            let id: String = (x+1).formatted
+            
+            platforms.append(
+                Device.Builder.Platform()
+                    .withName("\(DeviceEnum.platform.display) \(id)")
+                    .withRelease(Date.random)
+                    .withType(TypeEnum.allCases.randomElement()!)
+                    .withAbbrv(InputEnum.abbrv.random)
+                    .withFamily(InputEnum.family.random)
+                    .withGeneration(Int.random(in: 1...20))
+                    .withManufacturer(InputEnum.manufacturer.random)
+                    .withDeveloper(InputEnum.developer.random)
+                    .build(viewContext)
+            )
+            
+            Device.Builder.Game()
+                .withName("\(DeviceEnum.game.display) \(id)")
+                .withRelease(Date.random)
+                .withSeries(InputEnum.series.random)
+                .withMode(ModeEnum.allCases.randomElement()!)
+                .withGenre(InputEnum.genre.random)
+                .withPublisher(InputEnum.publisher.random)
+                .withDeveloper(InputEnum.developer.random)
+                .withFormat(DigitalEnum.allCases.randomElement()!, platforms.randomElement()!)
+                .withFormat(PhysicalEnum.allCases.randomElement()!, platforms.randomElement()!)
+                .build(viewContext)
+            
+            Device.Builder.Game(.unowned)
+                .withName("\(DeviceEnum.game.display) \(id)")
+                .withRelease(Date.random)
+                .build(viewContext)
+        }
+        
+        
         
         let platform: Device = Device.Builder.Platform()
             .withName("PlayStation 2")
-            .withReleased(2000, 10, 26)
+            .withRelease(2000, 10, 26)
             .withType(.console)
             .withAbbrv("PS2")
             .withFamily("PlayStation")
@@ -62,7 +82,7 @@ struct PersistenceController {
         
         Device.Builder.Game()
              .withName("Grand Theft Auto: Vice City")
-             .withReleased(2002, 10, 29)
+             .withRelease(2002, 10, 29)
              .withImage(imgData)
              .withSeries("Grand Theft Auto")
              .withMode(.single)

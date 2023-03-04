@@ -52,6 +52,10 @@ public class Device: Identifier {
     public var container: Property.Container {
         Property.Container(self)
     }
+    
+    public var shorthand: String {
+        "\(self.name) (\(self.release.year))" 
+    }
 }
 
 
@@ -132,8 +136,14 @@ extension Device {
         }
         
         @discardableResult
-        public func withReleased(_ y: Int, _ m: Int, _ d: Int) -> Self {
+        public func withRelease(_ y: Int, _ m: Int, _ d: Int) -> Self {
             self.release = Date(y, m, d)
+            return self
+        }
+        
+        @discardableResult
+        public func withRelease(_ dt: Date) -> Self {
+            self.release = dt
             return self
         }
         
@@ -347,6 +357,12 @@ extension Device {
         
     }
     
+    public static func compareByName(lhs: Device, rhs: Device) -> Bool {
+        lhs.name < rhs.name
+    }
     
+    public static func compareByRelease(lhs: Device, rhs: Device) -> Bool {
+        lhs.release < rhs.release
+    }
     
 }
