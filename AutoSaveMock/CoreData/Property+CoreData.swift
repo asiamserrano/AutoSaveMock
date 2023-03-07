@@ -145,19 +145,6 @@ extension Property {
             lhs.identity.int64 == rhs.identity
         }
         
-//        public var toString: String {
-//
-//            let a: String = "id: \(self.id)"
-//            let b: String = "identity: \(self.identity)"
-//            let c: String = "propertyEnum: \(self.propertyEnum.display)"
-//            let d: String = "deviceEnum: \(self.deviceEnum.display)"
-//            let e: String = "type: \(self.type)"
-//            let f: String = "value: \(self.value)"
-//            let g: String = "platform: \(self.platform?.name ?? "no platform")"
-//
-//            return [a,b,c,d,e,f,g].joined(separator: "\n")
-//        }
-
     }
     
     public class Container: TriadProtocol {
@@ -206,16 +193,37 @@ extension Property {
             self.insert(Builder(physical))
         }
         
-//        public func union(_ other: Device.Builder.Game.Container) -> Void {
-//            other.container.values.forEach { self.insert($0) }
-//        }
-        
         public var id: String {
             self.values.map { $0.id }.id
         }
         
         public var count: Int {
             self.values.count
+        }
+        
+        public func filter(_ str: String) -> [String] {
+            self.values.filter { $0.type == str }.map { $0.value }
+        }
+        
+        public func formats() -> FormatDictionary {
+            
+            let formats = self.values.filter { $0.propertyEnum == .format }
+            
+            var ret: FormatDictionary = .empty
+            
+            formats.forEach { item in
+                let platform: Device = item.platform!
+                let p: [PhysicalEnum] = formats.filter {
+                    $0.platform == platform && PhysicalEnum.contains($0.value)
+                }.map { PhysicalEnum($0.value) }
+                let d: [DigitalEnum] = formats.filter {
+                    $0.platform == platform && DigitalEnum.contains($0.value)
+                }.map { DigitalEnum($0.value) }
+                ret[platform] = (p, d)
+            }
+            
+            return ret
+            
         }
         
     }

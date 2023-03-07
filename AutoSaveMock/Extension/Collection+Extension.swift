@@ -19,7 +19,39 @@ extension Collection where Element == String {
     public func contains(_ element: String) -> Bool {
         self.map { $0 == element }.contains(true)
     }
+    
+    public var set: Set<Element> {
+        Set(self)
+    }
+    
+    public var array: [Element] {
+        self.sorted()
+    }
 
+}
+
+extension Set {
+    
+    public static var empty: Self {
+        []
+    }
+    
+}
+
+extension Array {
+    
+    public static var empty: Self {
+        []
+    }
+
+}
+
+extension Dictionary {
+    
+    public static var empty: Self {
+        [:]
+    }
+    
 }
 
 extension NSSet {

@@ -7,6 +7,48 @@
 
 import Foundation
 
+public enum FocusField: TriadProtocol {
+    case name, input(InputEnum), selection(SelectionEnum), format
+    
+    static let singletons: [Self] = [.input(.abbrv), .input(.series), .input(.family), .input(.generation), .selection(.type)]
+    static let multiple: [Self] = [.input(.developer), .input(.publisher), .input(.genre), .input(.manufacturer), .selection(.mode)]
+    
+    func filter(_ d: DeviceEnum) -> Bool {
+        switch self {
+        case .selection(let s):
+            return s.deviceInt == d.index
+        case .input(let i):
+            return i.deviceInt == d.index || i.deviceInt == -1
+        default:
+            return false
+        }
+    }
+
+    
+    public var id: String {
+        switch self {
+        case .input(let i):
+            return i.id
+        case .selection(let s):
+            return s.id
+        default:
+            return String(describing: self)
+        }
+    }
+    
+    public var display: String {
+        switch self {
+        case .input(let i):
+            return i.display
+        case .selection(let s):
+            return s.display
+        default:
+            return self.id.capitalized
+        }
+    }
+    
+}
+
 public enum ViewEnum: EnumProtocol {
     case list, icons
     
@@ -68,6 +110,15 @@ public enum DeviceEnum: EnumProtocol {
             return "gamecontroller.fill"
         case .platform:
             return "tv.and.mediabox.fill"
+        }
+    }
+    
+    var index: Int {
+        switch self {
+        case .game:
+            return 0
+        case .platform:
+            return 1
         }
     }
 
@@ -141,30 +192,30 @@ public enum InputEnum: EnumProtocol {
         }
     }
     
-   
-    public var singular: Bool {
+    public var deviceInt: Int {
         switch self {
-        case .family, .series, .generation, .abbrv:
-            return true
+        case .developer:
+            return -1
+        case .genre, .series, .publisher:
+            return DeviceEnum.game.index
         default:
-            return false
+            return DeviceEnum.platform.index
         }
     }
 
 }
 
 public enum SelectionEnum: EnumProtocol {
-    case mode
-    case type
+    case mode, type
     
-//    public var singular: Bool {
-//        switch self {
-//        case .mode:
-//            return false
-//        case .type:
-//            return true
-//        }
-//    }
+    public var deviceInt: Int {
+        switch self {
+        case .mode:
+            return DeviceEnum.game.index
+        case .type:
+            return DeviceEnum.platform.index
+        }
+    }
 
 }
 
@@ -184,8 +235,7 @@ public enum FormatEnum: EnumProtocol {
 }
 
 public enum PhysicalEnum: EnumProtocol {
-    case disc
-    case cartridge
+    case disc, cartridge
 }
 
 public enum DigitalEnum: EnumProtocol {

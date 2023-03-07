@@ -12,26 +12,12 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var menuEnum: MenuEnum = .library
-    
     @State private var viewEnum: ViewEnum = .list
     @State private var deviceEnum: DeviceEnum = .game
-    
     @State private var sortEnum: SortEnum = .name
     @State private var ascending: Bool = true
-    
-//    @State private var statusEnum: StatusEnum = .owned
-    
     @State private var search: String = .empty
-    
-//    @FetchRequest var fetchRequest: FetchedResults<Device>
-//
-//    public init() {
-////        let int: Int64 = -1
-////        let pred: NSPredicate = NSPredicate(format: "identity == %@", int.description)
-//
-//        self._fetchRequest = FetchRequest<Device>(sortDescriptors: [], predicate: nil)
-//    }
-    
+ 
     private var showLibraryItems: Bool {
         self.menuEnum == .library
     }
@@ -105,13 +91,12 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                LibraryView
-//                switch self.menuEnum {
-//                case .statistics:
-//                    Text("tbd")
-//                default:
-//                    LibraryView
-//                }
+                switch self.menuEnum {
+                case .statistics:
+                    Text("tbd")
+                default:
+                    LibraryView
+                }
             }
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
             .navigationTitle(self.title)
@@ -151,7 +136,7 @@ struct ContentView: View {
                         if self.menuEnum != .statistics {
                             Picker("DeviceEnum", selection: $deviceEnum) {
                                 ForEach(DeviceEnum.allCases, id: \.self) { item in
-                                    MenuItem(item.display + "s", item.icon)
+                                    MenuItem(item.display.pluralize, item.icon)
                                 }
                             }
                         }
@@ -186,7 +171,7 @@ struct ContentView: View {
                         })
                         
                         NavigationLink(destination: {
-                            Text("add")
+                            DeviceBuilderView(self.deviceEnum)
                         }, label: {
                             Image(systemName: "plus")
                         })
@@ -225,7 +210,11 @@ struct ContentView: View {
                 switch self.viewEnum {
                 case .list:
                     ForEach(self.items) { item in
-                        DeviceListView(item)
+                        NavigationLink(destination: {
+                            DeviceView(device: item)
+                        }, label: {
+                            DeviceListView(item)
+                        })
                     }.onDelete(perform: delete)
                 case .icons:
                     HStack(alignment: .top) {
@@ -266,7 +255,6 @@ struct ContentView: View {
         }
     }
     
-    
     @ViewBuilder
     private func IconViewSide(_ even: Bool) -> some View {
         VStack {
@@ -277,7 +265,6 @@ struct ContentView: View {
             }
         }
     }
-    
     
     @ViewBuilder
     private func DeviceIconView(_ device: Device) -> some View {

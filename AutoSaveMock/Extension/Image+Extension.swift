@@ -36,6 +36,10 @@ extension UIImage {
         Self()
     }
     
+    public static func == (lhs: UIImage, rhs: UIImage) -> Bool {
+        lhs.data == rhs.data
+    }
+    
 }
 
 extension Image {

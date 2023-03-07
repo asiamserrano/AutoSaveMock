@@ -9,10 +9,9 @@ import SwiftUI
 
 struct IconView: View {
     public static let defaultSize: CGFloat = 15
-    public static let defaultColor: Color = .blue
 
     public var iconName: String
-    public var iconColor: Color = Self.defaultColor
+    public var iconColor: Color = appDefaultColor
     public var iconSize: CGFloat = Self.defaultSize
 
     var body: some View {

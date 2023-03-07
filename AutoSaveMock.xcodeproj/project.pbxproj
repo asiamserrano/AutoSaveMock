@@ -19,6 +19,13 @@
 		1E24796529B007B4003A3D99 /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24796429B007B4003A3D99 /* Enumeration.swift */; };
 		1E24796829B0092D003A3D99 /* Device+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E24796629B0092D003A3D99 /* Device+CoreData.swift */; };
 		1E7DA00529B37FFC005629C4 /* IconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA00429B37FFC005629C4 /* IconView.swift */; };
+		1E7DA00729B50FAE005629C4 /* DeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA00629B50FAE005629C4 /* DeviceView.swift */; };
+		1E7DA00929B534DF005629C4 /* DeviceBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA00829B534DF005629C4 /* DeviceBuilderView.swift */; };
+		1E7DA00B29B53859005629C4 /* DeviceImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA00A29B53859005629C4 /* DeviceImageView.swift */; };
+		1E7DA00D29B53957005629C4 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA00C29B53957005629C4 /* ImagePicker.swift */; };
+		1E7DA01129B539FB005629C4 /* CenteredSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA01029B539FB005629C4 /* CenteredSectionView.swift */; };
+		1E7DA01329B53FFA005629C4 /* Device+Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA01229B53FFA005629C4 /* Device+Protocol.swift */; };
+		1E7DA01929B55DEB005629C4 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7DA01829B55DEB005629C4 /* Environment.swift */; };
 		6269E2EE29AFD7DF00A8DF47 /* AutoSaveMockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */; };
 		6269E2F029AFD7DF00A8DF47 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */; };
 		6269E2F229AFD7EA00A8DF47 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6269E2F129AFD7EA00A8DF47 /* Assets.xcassets */; };
@@ -42,6 +49,13 @@
 		1E24796429B007B4003A3D99 /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		1E24796629B0092D003A3D99 /* Device+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Device+CoreData.swift"; sourceTree = "<group>"; };
 		1E7DA00429B37FFC005629C4 /* IconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconView.swift; sourceTree = "<group>"; };
+		1E7DA00629B50FAE005629C4 /* DeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceView.swift; sourceTree = "<group>"; };
+		1E7DA00829B534DF005629C4 /* DeviceBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBuilderView.swift; sourceTree = "<group>"; };
+		1E7DA00A29B53859005629C4 /* DeviceImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceImageView.swift; sourceTree = "<group>"; };
+		1E7DA00C29B53957005629C4 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		1E7DA01029B539FB005629C4 /* CenteredSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenteredSectionView.swift; sourceTree = "<group>"; };
+		1E7DA01229B53FFA005629C4 /* Device+Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Device+Protocol.swift"; sourceTree = "<group>"; };
+		1E7DA01829B55DEB005629C4 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6269E2EA29AFD7DF00A8DF47 /* AutoSaveMock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoSaveMock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSaveMockApp.swift; sourceTree = "<group>"; };
 		6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -67,8 +81,12 @@
 		1E24794429AFDFA7003A3D99 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				1E7DA01029B539FB005629C4 /* CenteredSectionView.swift */,
 				6269E2EF29AFD7DF00A8DF47 /* ContentView.swift */,
 				1E7DA00429B37FFC005629C4 /* IconView.swift */,
+				1E7DA00629B50FAE005629C4 /* DeviceView.swift */,
+				1E7DA00829B534DF005629C4 /* DeviceBuilderView.swift */,
+				1E7DA00A29B53859005629C4 /* DeviceImageView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -103,6 +121,7 @@
 			children = (
 				1E24795F29AFFC88003A3D99 /* Triad+Protocol.swift */,
 				1E24796129B006B1003A3D99 /* Enum+Protocol.swift */,
+				1E7DA01229B53FFA005629C4 /* Device+Protocol.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -129,12 +148,14 @@
 				6269E2ED29AFD7DF00A8DF47 /* AutoSaveMockApp.swift */,
 				62E84B5029B0FF1900F4168D /* Configuration.swift */,
 				1E24796429B007B4003A3D99 /* Enumeration.swift */,
+				1E7DA00C29B53957005629C4 /* ImagePicker.swift */,
 				1E24795E29AFFC73003A3D99 /* Protocol */,
 				1E24795729AFF074003A3D99 /* Extension */,
 				1E24794529AFDFC3003A3D99 /* CoreData */,
 				1E24794429AFDFA7003A3D99 /* View */,
 				6269E2F129AFD7EA00A8DF47 /* Assets.xcassets */,
 				6269E2F329AFD7EA00A8DF47 /* Preview Content */,
+				1E7DA01829B55DEB005629C4 /* Environment.swift */,
 			);
 			path = AutoSaveMock;
 			sourceTree = "<group>";
@@ -217,11 +238,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E7DA00929B534DF005629C4 /* DeviceBuilderView.swift in Sources */,
 				1E24796229B006B1003A3D99 /* Enum+Protocol.swift in Sources */,
 				62E84B5329B0FF5A00F4168D /* MOC+Extension.swift in Sources */,
 				1E102D9829B01B4700C7D4F1 /* Collection+Extension.swift in Sources */,
+				1E7DA00B29B53859005629C4 /* DeviceImageView.swift in Sources */,
 				1E24796529B007B4003A3D99 /* Enumeration.swift in Sources */,
 				1E24795929AFF085003A3D99 /* String+Extension.swift in Sources */,
+				1E7DA00D29B53957005629C4 /* ImagePicker.swift in Sources */,
 				6269E2F729AFD7EA00A8DF47 /* Persistence.swift in Sources */,
 				1E102D9A29B0210200C7D4F1 /* Image+Extension.swift in Sources */,
 				62E84B5129B0FF1900F4168D /* Configuration.swift in Sources */,
@@ -229,10 +253,14 @@
 				1E24796829B0092D003A3D99 /* Device+CoreData.swift in Sources */,
 				1E24794D29AFE286003A3D99 /* Property+CoreData.swift in Sources */,
 				6269E2EE29AFD7DF00A8DF47 /* AutoSaveMockApp.swift in Sources */,
+				1E7DA01129B539FB005629C4 /* CenteredSectionView.swift in Sources */,
 				1E24795D29AFF77E003A3D99 /* Int+Extension.swift in Sources */,
 				1E7DA00529B37FFC005629C4 /* IconView.swift in Sources */,
 				1E24795629AFF00A003A3D99 /* Identifier+CoreData.swift in Sources */,
 				6269E2FA29AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld in Sources */,
+				1E7DA01929B55DEB005629C4 /* Environment.swift in Sources */,
+				1E7DA01329B53FFA005629C4 /* Device+Protocol.swift in Sources */,
+				1E7DA00729B50FAE005629C4 /* DeviceView.swift in Sources */,
 				1E24795B29AFF696003A3D99 /* Date+Extension.swift in Sources */,
 				1E24796029AFFC88003A3D99 /* Triad+Protocol.swift in Sources */,
 			);

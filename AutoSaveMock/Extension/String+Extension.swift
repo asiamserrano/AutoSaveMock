@@ -37,4 +37,8 @@ extension String {
         self.stripped.count == 0
     }
     
+    public var pluralize: Self {
+        "\(self)s"
+    }
+    
 }

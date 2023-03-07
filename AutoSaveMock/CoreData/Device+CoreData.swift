@@ -90,14 +90,14 @@ extension Device {
 extension Device {
     
     public class Builder: TriadProtocol {
-        public let added: Date
+        
         public let deviceEnum: DeviceEnum
         public let statusEnum: StatusEnum
         
+        public var added: Date
         public var release: Date
         public var name: String
         public var uiimage: UIImage
-        
         public var container: Property.Container
         
         public var id: String {
@@ -148,7 +148,13 @@ extension Device {
         }
         
         @discardableResult
-        public func withImage(_ dt: Data) -> Self {
+        public func withAdded(_ dt: Date) -> Self {
+            self.added = dt
+            return self
+        }
+        
+        @discardableResult
+        public func withImage(_ dt: Data?) -> Self {
             self.uiimage = UIImage(dt)
             return self
         }
@@ -176,6 +182,10 @@ extension Device {
         
         public static func == (lhs: Device.Builder, rhs: Property.Container) -> Bool {
             lhs.container.identity == rhs.identity
+        }
+        
+        public static func == (lhs: Device.Builder, rhs: UIImage) -> Bool {
+            lhs.uiimage == rhs
         }
         
         public class Game: Builder {
@@ -307,6 +317,14 @@ extension Device {
                 return self
             }
             
+            public func setFormats(_ dict: FormatDictionary) -> Self {
+                dict.forEach { key, value in
+                    value.d.forEach { self.withFormat($0, key) }
+                    value.p.forEach { self.withFormat($0, key) }
+                }
+                return self
+            }
+            
         }
         
         public class Platform: Builder {
@@ -336,7 +354,13 @@ extension Device {
             
             @discardableResult
             public func withGeneration(_ int: Int) -> Self {
-                self.container.insert(.generation, int.formatted, self.deviceEnum)
+                self.withGeneration(int.formatted)
+                return self
+            }
+            
+            @discardableResult
+            public func withGeneration(_ str: String) -> Self {
+                self.container.insert(.generation, str, self.deviceEnum)
                 return self
             }
             
@@ -363,6 +387,10 @@ extension Device {
     
     public static func compareByRelease(lhs: Device, rhs: Device) -> Bool {
         lhs.release < rhs.release
+    }
+    
+    public static func == (lhs: Device, rhs: DeviceEnum) -> Bool {
+        lhs.device_enum == rhs
     }
     
 }

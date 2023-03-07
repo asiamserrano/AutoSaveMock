@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol EnumProtocol: TriadProtocol, CaseIterable {
+public protocol EnumProtocol: TriadProtocol, CaseIterable, Comparable {
     
     var display: String { get }
     
@@ -32,6 +32,12 @@ public extension EnumProtocol {
     
     static func contains(_ str: String) -> Bool {
         Self.allCases.map { $0.id }.contains(str)
+    }
+    
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        let a: Self.AllCases.Index = Self.allCases.firstIndex(of: lhs)!
+        let b:  Self.AllCases.Index = Self.allCases.firstIndex(of: rhs)!
+        return a < b
     }
     
 }
