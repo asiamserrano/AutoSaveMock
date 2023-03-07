@@ -9,7 +9,9 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var alert: AlertObject
     
     @State private var menuEnum: MenuEnum = .library
     @State private var viewEnum: ViewEnum = .list
@@ -78,6 +80,8 @@ struct ContentView: View {
                 return Device.compareByName
             case .release:
                 return Device.compareByRelease
+            case .added:
+                return Device.compareByAdded
             }
         }
         
@@ -91,6 +95,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
+                
                 switch self.menuEnum {
                 case .statistics:
                     Text("tbd")
@@ -98,10 +103,13 @@ struct ContentView: View {
                     LibraryView
                 }
             }
+            .alert(isPresented: $alert.show) {
+                self.alert.generateAlert
+            }
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
             .navigationTitle(self.title)
             .popover(isPresented: $popover) {
-                Text("tbd")
+                PropertyFilterView($deviceEnum)
             }
             .toolbar {
                 
@@ -281,6 +289,8 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView()
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+            .environmentObject(AlertObjectKey.defaultValue)
     }
 }

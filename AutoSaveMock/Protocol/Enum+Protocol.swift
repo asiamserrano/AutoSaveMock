@@ -20,7 +20,7 @@ public extension EnumProtocol {
     }
     
     init(_ str: String) {
-        self = str.isEmpty ? Self.allCases.first! : Self.allCases.first(where: { $0.id == str } )!
+        self = str.isEmpty ? Self.allCases.first! : Self.allCases.first(where: { $0.equals(str) } )!
     }
     
     var id: String { String(describing: self) }
@@ -31,13 +31,17 @@ public extension EnumProtocol {
     }
     
     static func contains(_ str: String) -> Bool {
-        Self.allCases.map { $0.id }.contains(str)
+        Self.allCases.map { $0.equals(str) }.contains(true)
     }
     
     static func < (lhs: Self, rhs: Self) -> Bool {
         let a: Self.AllCases.Index = Self.allCases.firstIndex(of: lhs)!
         let b:  Self.AllCases.Index = Self.allCases.firstIndex(of: rhs)!
         return a < b
+    }
+    
+    private func equals(_ str: String) -> Bool {
+        [self.id, self.display].contains(str)
     }
     
 }

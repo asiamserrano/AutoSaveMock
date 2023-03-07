@@ -27,9 +27,20 @@ extension MOC {
     }
         
     public func remove(_ object: NSManagedObject) -> Void {
+        
+        var runDestroy: Bool {
+            if let dev: Device = object as? Device {
+                if dev.status_enum == .owned {
+                    return true
+                }
+            }
+            
+            return false
+        }
+        
         self.delete(object)
         self.store()
-        if let _: Device = object as? Device { self.clean() }
+        if runDestroy { self.clean() }
     }
     
     private func clean() -> Void {
@@ -69,6 +80,14 @@ extension MOC {
         
         self.store()
         return property
+    }
+    
+    public func exists(_ builder: Device.Builder) -> Device? {
+        self.exists(builder.identity)
+    }
+    
+    public func exists(_ int: Int) -> Device? {
+        self.createFetchRequest(.Device, int).first as? Device
     }
     
     public func build(_ builder: Device.Builder, _ d: Device? = nil) -> Device {

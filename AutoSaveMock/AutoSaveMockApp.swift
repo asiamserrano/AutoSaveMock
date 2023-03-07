@@ -9,12 +9,14 @@ import SwiftUI
 
 @main
 struct AutoSaveMockApp: App {
-    let persistenceController = PersistenceController.shared
+    let persistenceController: PersistenceController = PersistenceController.shared
+    let alertObject: AlertObject = AlertObjectKey.defaultValue
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(alertObject)
         }
     }
 }

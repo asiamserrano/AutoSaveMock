@@ -80,12 +80,14 @@ public enum MenuEnum: EnumProtocol {
 }
 
 public enum SortEnum: EnumProtocol {
-    case name, release
+    case name, release, added
     
     public var display: String {
         switch self {
         case .release:
             return "Release Date"
+        case .added:
+            return "Add Date"
         default:
             return Self.getDisplay(self)
         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct DeviceView: View {
     
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var alert: AlertObject
     
     @ObservedObject var device: Device
     
@@ -78,6 +79,14 @@ struct DeviceView: View {
                     }
                 }
             }
+            
+            HStack {
+                Spacer()
+                Text("Added on \(self.device.added.long)")
+                    .foregroundColor(.gray)
+                    .italic()
+                Spacer()
+            }.listRowBackground(Color.clear)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {

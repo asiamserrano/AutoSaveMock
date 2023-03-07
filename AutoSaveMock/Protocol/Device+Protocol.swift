@@ -55,7 +55,6 @@ extension BuilderProtocol {
                 .keyboardType(t == .input(.generation) ? .numberPad : .alphabet)
                 .disableAutocorrection(true)
                 .multilineTextAlignment(.leading)
-            //                .focused($focused, equals: t)
             
             if !txt_str.isEmpty {
                 

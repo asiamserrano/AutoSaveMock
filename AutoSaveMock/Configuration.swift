@@ -21,3 +21,5 @@ public typealias PhysicalTuple = (physicalEnum: PhysicalEnum, platform: Device)
 public typealias FormatDictionary = [Device: (p: [PhysicalEnum], d: [DigitalEnum])]
 //public typealias FormatTuples = Set<FormatTuple>
 
+public typealias AlertObject = AlertObjectKey.AlertObject
+

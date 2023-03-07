@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct DeviceBuilderView: BuilderViewProtocol {
+    
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var alert: AlertObject
     
     @ObservedObject var device: DeviceObservable
     
@@ -36,6 +39,14 @@ struct DeviceBuilderView: BuilderViewProtocol {
     
     private var deviceEnum: DeviceEnum {
         self.device.deviceEnum
+    }
+    
+    private var isNew: Bool {
+        self.device.device == nil
+    }
+    
+    private var mode: String {
+        self.isNew ? "Add" : "Edit"
     }
     
     var body: some View {
@@ -110,6 +121,8 @@ struct DeviceBuilderView: BuilderViewProtocol {
             }
             
         }
+        .navigationTitle("\(self.mode) \(self.deviceEnum.display)")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             
@@ -123,6 +136,41 @@ struct DeviceBuilderView: BuilderViewProtocol {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    let old: Device? = self.device.device
+                    let builder: Device.Builder = self.device.builder
+                    let ret: Device? = self.viewContext.exists(builder)
+                    let enumStr: String = self.deviceEnum.display
+                    let title: String = isNew ? "Created" : "Edited"
+                    let end: String = isNew ? "added" : "updated"
+                    let c: Alert.Button = .cancel()
+                    
+                    if ret == nil || ret == old {
+                        
+                        var wish: Int {
+                            [
+                                builder.name,
+                                builder.release.dashless,
+                                StatusEnum.unowned.id,
+                                builder.deviceEnum.id
+                            ].id.hashed
+                        }
+                        
+                        let new: Device = self.viewContext.build(builder, old)
+                        let a: String = "\(enumStr) \(title)"
+                        let b: String = "\(new.shorthand) has been sucessfully \(end)!"
+                        
+                        if let wishlist: Device = self.viewContext.exists(wish) {
+                            let primary: Alert.Button = .default(Text("Yes"), action: {
+                                self.viewContext.remove(wishlist)
+                            })
+                            self.alert.toggle(a, "\(b) Remove from wishlist?", primary, .cancel(Text("No")))
+                        } else {
+                            self.alert.toggle(a, b, c)
+                        }
+                    } else {
+                        self.alert.toggle("Unable to \(self.mode)", "\(ret!.shorthand) already exists!", c)
+                    }
+                    
                     self.dismiss()
                 }, label: {
                     Text("Done")
@@ -324,7 +372,13 @@ extension DeviceBuilderView {
         override init(_ d: Device) {
             self.abbrv = d.container.filter(InputEnum.abbrv.id).first ?? .empty
             self.family = d.container.filter(InputEnum.family.id).first ?? .empty
-            self.generation = d.container.filter(InputEnum.generation.id).first ?? .empty
+            self.generation = {
+                if let first: String = d.container.filter(InputEnum.generation.id).first {
+                    return Int(first)!.ordinal
+                } else {
+                    return .empty
+                }
+            }()
             self.type = {
                 if let str: String =  d.container.filter(SelectionEnum.type.id).first {
                     return TypeEnum(str)
@@ -458,9 +512,7 @@ extension DeviceBuilderView {
             func load() -> [String] {
                 switch self.focused {
                 case .selection(.type):
-                    return TypeEnum.allCases.map { $0.id }
-                case .selection(.mode):
-                    return ModeEnum.allCases.map { $0.id }
+                    return TypeEnum.allCases.map { $0.display }
                 default:
                     return self.viewContext
                         .filterProperties(self.deviceEnum, self.focused.id)
@@ -522,7 +574,8 @@ extension DeviceBuilderView {
                     }
                     
                     Section {
-                        ForEach(self.options, id:\.self) { val in
+                        ForEach(self.options, id:\.self) { v in
+                            let val: String = self.focused == .input(.generation) ? Int(v)!.ordinal : v
                             FormButton(action: {
                                 self.string = val
                             }, label: {

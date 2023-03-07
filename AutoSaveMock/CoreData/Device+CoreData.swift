@@ -190,76 +190,6 @@ extension Device {
         
         public class Game: Builder {
             
-//            public class Container: TriadProtocol {
-//
-//                public enum Format: TriadProtocol {
-//
-//                    case physical(PhysicalTuple)
-//                    case digital(DigitalTuple)
-//
-//                    public var id: String {
-//                        [self.value.0, self.value.1.identity.description].id
-//                    }
-//
-//                    public var value: (String, Device) {
-//                        switch self {
-//                        case .physical(let p):
-//                            return (p.physicalEnum.id, p.platform)
-//                        case .digital(let d):
-//                            return (d.digitalEnum.id, d.platform)
-//                        }
-//                    }
-//
-//                }
-//
-//                var values: Set<Format>
-//
-//                public init() {
-//                    self.values = []
-//                }
-//
-//                public convenience init(_ arr: [Property]) {
-//                    self.init()
-//
-//                    arr.filter { $0.identity_enum == PropertyEnum.format.id }.forEach { property in
-//                        let platform: Device = property.platform!
-//                        let value: String = property.value
-//                        if PhysicalEnum.contains(value) {
-//                            self.insert((PhysicalEnum(value), platform))
-//                        } else if DigitalEnum.contains(value) {
-//                            self.insert((DigitalEnum(value), platform))
-//                        }
-//                    }
-//
-//                }
-//
-//                public var id: String {
-//                    self.values.map{ $0.id }.id
-//                }
-//
-//                public func insert(_ dig: DigitalTuple) -> Void {
-//                    self.values.insert(.digital(dig))
-//                }
-//
-//                public func insert(_ dig: PhysicalTuple) -> Void {
-//                    self.values.insert(.physical(dig))
-//                }
-//
-//                public var container: Property.Container {
-//                    let con: Property.Container = Property.Container()
-//                    self.values.forEach { item in
-//                        switch item {
-//                        case .physical(let p):
-//                            return con.insert(p)
-//                        case .digital(let d):
-//                            return con.insert(d)
-//                        }
-//                    }
-//                    return con
-//                }
-//
-//            }
-            
             public init(_ status: StatusEnum = .owned) {
                 super.init(status, .game)
             }
@@ -355,12 +285,15 @@ extension Device {
             @discardableResult
             public func withGeneration(_ int: Int) -> Self {
                 self.withGeneration(int.formatted)
-                return self
             }
             
             @discardableResult
             public func withGeneration(_ str: String) -> Self {
-                self.container.insert(.generation, str, self.deviceEnum)
+                var s: String = str
+                ["st", "rd", "th"].forEach {
+                    s = s.replacingOccurrences(of: $0, with: "")
+                }
+                self.container.insert(.generation, Int(s)!.formatted, self.deviceEnum)
                 return self
             }
             
@@ -382,11 +315,25 @@ extension Device {
     }
     
     public static func compareByName(lhs: Device, rhs: Device) -> Bool {
-        lhs.name < rhs.name
+        let l: String = lhs.name.stripped
+        let r: String = rhs.name.stripped
+        
+        return l == r ? compareByRelease(lhs: lhs, rhs: rhs) : l < r
+        
     }
     
     public static func compareByRelease(lhs: Device, rhs: Device) -> Bool {
-        lhs.release < rhs.release
+        let l: String = lhs.release.dashless
+        let r: String = rhs.release.dashless
+        
+        return l == r ? compareByName(lhs: lhs, rhs: rhs) : l < r
+    }
+    
+    public static func compareByAdded(lhs: Device, rhs: Device) -> Bool {
+        let l: String = lhs.added.dashless
+        let r: String = rhs.added.dashless
+        
+        return l == r ? compareByName(lhs: lhs, rhs: rhs) : l < r
     }
     
     public static func == (lhs: Device, rhs: DeviceEnum) -> Bool {
