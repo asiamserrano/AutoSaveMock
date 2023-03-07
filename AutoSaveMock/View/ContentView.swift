@@ -101,14 +101,7 @@ struct ContentView: View {
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
             .navigationTitle(self.title)
             .popover(isPresented: $popover) {
-                Picker("Filter", selection: $filter) {
-                    ForEach(["red","yellow","orange", "blue", "green"], id:\.self) { item in
-                        Text(item)
-                    }
-                }.pickerStyle(MenuPickerStyle())
-                .onChange(of: self.filter) { _ in
-                    self.popover = false
-                }
+                Text("tbd")
             }
             .toolbar {
                 
