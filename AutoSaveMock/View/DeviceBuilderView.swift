@@ -798,7 +798,7 @@ extension DeviceBuilderView {
                             self.game.formats[self.key!] = (p: self.physical, d: self.digital)
                             self.close()
                         }, label: {
-                            Text("Done")
+                            Text("Save")
                         }).disabled(self.disabled)
                     }
                     

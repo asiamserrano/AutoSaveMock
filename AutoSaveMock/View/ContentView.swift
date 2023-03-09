@@ -13,8 +13,8 @@ struct ContentView: BuilderViewProtocol {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var alert: AlertObject
     
-    @State private var menuEnum: MenuEnum = .library
-    @State private var viewEnum: ViewEnum = .icons
+    @State private var menuEnum: MenuEnum = .wishlist
+    @State private var viewEnum: ViewEnum = .list
     @State private var deviceEnum: DeviceEnum = .game
     @State private var sortEnum: SortEnum = .name
     @State private var ascending: Bool = true
@@ -22,28 +22,31 @@ struct ContentView: BuilderViewProtocol {
     @State private var popover: Bool = false
     @State private var iconDevice: Device? = nil
     @State private var iconShow: Bool = false
+    @State private var mode: EditMode = .inactive
     
     @StateObject private var selected: PropertyFilterView.FilterObservable = .init()
+    
     
     var body: some View {
         NavigationStack {
             VStack {
-                
                 switch self.menuEnum {
                 case .statistics:
-                    Text("tbd")
-                default:
+                    Text("statistics")
+                case .wishlist:
+                    List {
+                        ForEach(self.items) { item in
+                            NavigationLink(destination: {
+                                WishlistBuilderView(item)
+                            }, label: {
+                                Text(item.name)
+                            })
+                        }.onDelete(perform: self.delete)
+                    }
+                case .library:
                     LibraryView
                 }
             }
-//            .navigationDestination(isPresented: $iconShow) {
-//                if let d: Device = self.iconDevice {
-//                    DeviceView(device: d)
-//                        .onDisappear {
-//                            self.iconDevice = nil
-//                        }
-//                }
-//            }
             .alert(isPresented: $alert.show) {
                 self.alert.generateAlert
             }
@@ -103,25 +106,44 @@ struct ContentView: BuilderViewProtocol {
                     
                 }
                 
-                if self.showLibraryItems {
+                if self.menuEnum != .statistics {
                     ToolbarItemGroup(placement: .bottomBar) {
                         
-                        Button(action: {
+                        if self.showLibraryItems {
+                            Button(action: {
+                                withAnimation {
+                                    self.isFilterActivated ? self.selected.reset() : self.popover.toggle()
+                                }
+                            }, label: {
+                                Image(systemName: "line.3.horizontal.decrease.circle\( self.isFilterActivated ? ".fill" : .empty )")
+                            })
+                            
+                            NavigationLink(destination: {
+                                DeviceBuilderView(self.deviceEnum)
+                            }, label: {
+                                Image(systemName: "plus")
+                            })
+                        } else {
+                            
                             withAnimation {
-                                self.isFilterActivated ? self.selected.reset() : self.popover.toggle()
+                                EditButton()
                             }
-                        }, label: {
-                            Image(systemName: "line.3.horizontal.decrease.circle\( self.isFilterActivated ? ".fill" : .empty )")
-                        })
-                        
-                        NavigationLink(destination: {
-                            DeviceBuilderView(self.deviceEnum)
-                        }, label: {
-                            Image(systemName: "plus")
-                        })
+                            
+                            Spacer()
+                            
+                            if !self.mode.isEditing {
+                                NavigationLink(destination: {
+                                    WishlistBuilderView(self.deviceEnum)
+                                }, label: {
+                                    Image(systemName: "plus")
+                                })
+                            }
+                            
+                        }
                         
                     }
                 }
+                
                 
                 ToolbarItem(placement: .status) {
                     if self.isFilterActivated {
@@ -137,8 +159,10 @@ struct ContentView: BuilderViewProtocol {
                 }
                 
             }
+            .environment(\.editMode, $mode)
         }
     }
+    
     
     private func delete(_ offsets: IndexSet) -> Void {
         if let index: Int = offsets.first {
@@ -149,12 +173,15 @@ struct ContentView: BuilderViewProtocol {
     private func delete(_ del: Device) -> Void {
         let t: String = "Confirm delete \(self.deviceEnum.id)"
         let m: String = "Are you sure you want to delete \(del.shorthand)?"
-        let primary: Alert.Button = .destructive(Text("Yes"), action: {
-            withAnimation {
-                self.viewContext.remove(del)
-            }
-        })
-        self.alert.toggle(t, m, primary, .cancel(Text("No")))
+        let action: () -> Void = { self.viewContext.remove(del) }
+        
+        if self.menuEnum == .wishlist {
+            action()
+        } else {
+            let primary: Alert.Button = .destructive(Text("Yes"), action: action)
+            self.alert.toggle(t, m, primary, .cancel(Text("No")))
+        }
+        
     }
     
 }
@@ -291,7 +318,7 @@ extension ContentView {
                             DeviceIconView(self.items.first!)
                             Spacer()
                         }
-                    }
+                    }.onAppear { self.iconDevice = nil }
                 }
             }
         }
@@ -336,12 +363,8 @@ extension ContentView {
                     .foregroundColor(.white)
                     .bold()
             }
-            .onTapGesture {
-                self.iconDevice = device
-            }
-            .onLongPressGesture {
-                self.delete(device)
-            }
+            .onTapGesture { self.iconDevice = device }
+            .onLongPressGesture { self.delete(device) }
         })
         .padding()
         .background(.pink)
@@ -351,9 +374,6 @@ extension ContentView {
         .navigationDestination(isPresented: $iconShow) {
             if let d: Device = self.iconDevice {
                 DeviceView(device: d)
-                    .onDisappear {
-                        self.iconDevice = nil
-                    }
             }
         }
         
