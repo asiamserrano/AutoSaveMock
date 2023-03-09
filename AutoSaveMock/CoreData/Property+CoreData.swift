@@ -36,6 +36,17 @@ public class Property: Identifier {
         }
     }
     
+    public var property_filter: PropertyFilter {
+        switch self.property_enum {
+        case .input:
+            return .input(InputEnum(self.type_enum))
+        case .selection:
+            return .selection(SelectionEnum(self.type_enum))
+        case .format:
+            return .format(FormatEnum(self.type_enum))
+        }
+    }
+    
     public var builder: Builder {
         Builder(self)
     }
@@ -205,6 +216,10 @@ extension Property {
             self.values.filter { $0.type == str }.map { $0.value }
         }
         
+        public func contains(_ str: String) -> Bool {
+            self.values.contains(where: { $0.value == str })
+        }
+        
         public func formats() -> FormatDictionary {
             
             let formats = self.values.filter { $0.propertyEnum == .format }
@@ -227,19 +242,12 @@ extension Property {
         }
         
     }
+}
+
+extension Property {
     
-    public var toString: String {
-        
-        let a: String = "identity: \(self.identity)"
-        let b: String = "identity_enum: \(self.identity_enum_str!)"
-        let c: String = "device_enum: \(self.device_enum_str!)"
-        let d: String = "type_enum: \(self.type_enum_str!)"
-        let e: String = "value_str: \(self.value_str!)"
-        let f: String = "platform: \(self.platform?.name ?? "nil")"
-        let g: String = "# of devices: \(self.devices.count)"
-        
-        return [a,b,c,d,e,f,g].joined(separator: "\n")
+    public static func compareByValue(lhs: Property, rhs: Property) -> Bool {
+        lhs.value.stripped < rhs.value.stripped
     }
-
-
+    
 }

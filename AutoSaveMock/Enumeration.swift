@@ -7,6 +7,61 @@
 
 import Foundation
 
+public enum PropertyFilter: TriadProtocol {
+    case input(InputEnum)
+    case selection(SelectionEnum)
+    case format(FormatEnum)
+    
+    public var id: String {
+        switch self {
+        case .input(let i):
+            return i.id
+        case .selection(let s):
+            return s.id
+        case .format(let s):
+            return s.id
+        }
+    }
+    
+    public var display: String {
+        switch self {
+        case .input(let i):
+            return i.display
+        case .selection(let s):
+            return s.display
+        case .format(let s):
+            return "\(s.display) format"
+        }
+    }
+    
+    public func cast(_ str: String) -> String {
+        switch self {
+        case .input(let s):
+            switch s {
+            case .generation:
+                return Int(str)!.ordinal
+            default:
+                return str
+            }
+        case .selection(let s):
+            switch s {
+            case .type:
+                return TypeEnum(str).display
+            case .mode:
+                return ModeEnum(str).display
+            }
+        case .format(let s):
+            switch s {
+            case .digital:
+                return DigitalEnum(str).display
+            case .physical:
+                return PhysicalEnum(str).display
+            }
+        }
+    }
+    
+}
+
 public enum FocusField: TriadProtocol {
     case name, input(InputEnum), selection(SelectionEnum), format
     

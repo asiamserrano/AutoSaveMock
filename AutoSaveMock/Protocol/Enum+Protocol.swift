@@ -30,18 +30,24 @@ public extension EnumProtocol {
         "\(self.display) \(String(format: "%04d", Int.random(in: 0...9999)))"
     }
     
+    var index: Self.AllCases.Index {
+        Self.allCases.firstIndex(of: self)!
+    }
+    
     static func contains(_ str: String) -> Bool {
         Self.allCases.map { $0.equals(str) }.contains(true)
     }
     
     static func < (lhs: Self, rhs: Self) -> Bool {
-        let a: Self.AllCases.Index = Self.allCases.firstIndex(of: lhs)!
-        let b:  Self.AllCases.Index = Self.allCases.firstIndex(of: rhs)!
-        return a < b
+        lhs.index < rhs.index
     }
     
     private func equals(_ str: String) -> Bool {
         [self.id, self.display].contains(str)
+    }
+    
+    func equals(_ other: any EnumProtocol) -> Bool {
+        self.equals(other.id)
     }
     
 }

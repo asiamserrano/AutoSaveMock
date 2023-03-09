@@ -140,9 +140,9 @@ struct DeviceBuilderView: BuilderViewProtocol {
                     let builder: Device.Builder = self.device.builder
                     let ret: Device? = self.viewContext.exists(builder)
                     let enumStr: String = self.deviceEnum.display
-                    let title: String = isNew ? "Created" : "Edited"
+                    let title: String = isNew ? "created" : "edited"
                     let end: String = isNew ? "added" : "updated"
-                    let c: Alert.Button = .cancel()
+                    let c: Alert.Button = .cancel(Text("Okay"))
                     
                     if ret == nil || ret == old {
                         
@@ -315,42 +315,7 @@ extension DeviceBuilderView {
         func remove(_ int: Int) -> Void {
             self.formats[self.keys[int]] = nil
         }
-    //
-    //    func remove(_ item: String) -> Void {
-    //        if let active: Device = self.key {
-    //            if let items: (p: [PhysicalEnum], d: [DigitalEnum]) = self.formats[active] {
-    //                if DigitalEnum.contains(item) {
-    //                    var new: [DigitalEnum] = items.d.filter { $0 != DigitalEnum(item) }
-    //                    self.formats[active] = (p: items.p, d: new)
-    //                } else if PhysicalEnum.contains(item) {
-    //                    var new: [PhysicalEnum] = items.p.filter { $0 != PhysicalEnum(item) }
-    //                    self.formats[active] = (p: new, d: items.d)
-    //                }
-    //            }
-    //        }
-    //    }
-    //
-    //    func insert(_ item: String) -> Void {
-    //        if let active: Device = self.key {
-    //            if let items: (p: [PhysicalEnum], d: [DigitalEnum]) = self.formats[active] {
-    //                if DigitalEnum.contains(item) {
-    //                    self.formats[active] = (p: items.p, d: Set(items.d + [DigitalEnum(item)]).sorted())
-    //                } else if PhysicalEnum.contains(item) {
-    //                    self.formats[active] = (p: Set(items.p + [PhysicalEnum(item)]).sorted(), d: items.d)
-    //                }
-    //            }
-    //        }
-    //    }
-    //
-    //    func contains(_ item: String) -> Bool {
-    //        if let active: Device = self.key {
-    //            if let items: (p: [PhysicalEnum], d: [DigitalEnum]) = self.formats[active] {
-    //                return items.d.map { $0.id }.contains(item) || items.p.map { $0.id }.contains(item)
-    //            }
-    //        }
-    //
-    //        return false
-    //    }
+    
     }
 
     class PlatformObservable: DeviceObservable {
@@ -801,10 +766,6 @@ extension DeviceBuilderView {
         var body: some View {
             NavigationView {
                 Form {
-                    
-//                    Text("key?: \(self.game.key?.name ?? "no key")")
-//                    Text("keys?: \(self.game.keys.description)")
-//                    Text("disabledEdit: \(self.disableEdit.description)")
                     
                     NavigationLink(destination: {
                         PlatformListView(self.game, $key)

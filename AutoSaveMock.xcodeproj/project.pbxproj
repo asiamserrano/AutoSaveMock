@@ -32,6 +32,7 @@
 		6269E2F529AFD7EA00A8DF47 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6269E2F429AFD7EA00A8DF47 /* Preview Assets.xcassets */; };
 		6269E2F729AFD7EA00A8DF47 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2F629AFD7EA00A8DF47 /* Persistence.swift */; };
 		6269E2FA29AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6269E2F829AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld */; };
+		6294474F29B928DA00935106 /* FoobarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6294474E29B928DA00935106 /* FoobarView.swift */; };
 		62E84B5129B0FF1900F4168D /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62E84B5029B0FF1900F4168D /* Configuration.swift */; };
 		62E84B5329B0FF5A00F4168D /* MOC+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62E84B5229B0FF5A00F4168D /* MOC+Extension.swift */; };
 		62F9932B29B7EC5D008D733E /* PropertyFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F9932A29B7EC5D008D733E /* PropertyFilterView.swift */; };
@@ -64,6 +65,7 @@
 		6269E2F429AFD7EA00A8DF47 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6269E2F629AFD7EA00A8DF47 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		6269E2F929AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AutoSaveMock.xcdatamodel; sourceTree = "<group>"; };
+		6294474E29B928DA00935106 /* FoobarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoobarView.swift; sourceTree = "<group>"; };
 		62E84B5029B0FF1900F4168D /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		62E84B5229B0FF5A00F4168D /* MOC+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MOC+Extension.swift"; sourceTree = "<group>"; };
 		62F9932A29B7EC5D008D733E /* PropertyFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyFilterView.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 				1E7DA00829B534DF005629C4 /* DeviceBuilderView.swift */,
 				1E7DA00A29B53859005629C4 /* DeviceImageView.swift */,
 				62F9932A29B7EC5D008D733E /* PropertyFilterView.swift */,
+				6294474E29B928DA00935106 /* FoobarView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 				1E7DA00529B37FFC005629C4 /* IconView.swift in Sources */,
 				1E24795629AFF00A003A3D99 /* Identifier+CoreData.swift in Sources */,
 				6269E2FA29AFD7EA00A8DF47 /* AutoSaveMock.xcdatamodeld in Sources */,
+				6294474F29B928DA00935106 /* FoobarView.swift in Sources */,
 				1E7DA01929B55DEB005629C4 /* Environment.swift in Sources */,
 				1E7DA01329B53FFA005629C4 /* Device+Protocol.swift in Sources */,
 				1E7DA00729B50FAE005629C4 /* DeviceView.swift in Sources */,

@@ -8,18 +8,161 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct ContentView: BuilderViewProtocol {
     
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var alert: AlertObject
     
     @State private var menuEnum: MenuEnum = .library
-    @State private var viewEnum: ViewEnum = .list
+    @State private var viewEnum: ViewEnum = .icons
     @State private var deviceEnum: DeviceEnum = .game
     @State private var sortEnum: SortEnum = .name
     @State private var ascending: Bool = true
     @State private var search: String = .empty
- 
+    @State private var popover: Bool = false
+    @State private var iconDevice: Device? = nil
+    @State private var iconShow: Bool = false
+    
+    @StateObject private var selected: PropertyFilterView.FilterObservable = .init()
+    
+    var body: some View {
+        NavigationStack {
+            VStack {
+                
+                switch self.menuEnum {
+                case .statistics:
+                    Text("tbd")
+                default:
+                    LibraryView
+                }
+            }
+//            .navigationDestination(isPresented: $iconShow) {
+//                if let d: Device = self.iconDevice {
+//                    DeviceView(device: d)
+//                        .onDisappear {
+//                            self.iconDevice = nil
+//                        }
+//                }
+//            }
+            .alert(isPresented: $alert.show) {
+                self.alert.generateAlert
+            }
+            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
+            .navigationTitle(self.title)
+            .popover(isPresented: $popover) {
+                PropertyFilterView($deviceEnum, self.selected)
+            }
+            .toolbar {
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    
+                    Menu(content: {
+                        Picker("Menu picker", selection: $menuEnum.animation()) {
+                            ForEach(MenuEnum.allCases, id:\.self) { item in
+                                HStack {
+                                    Text(item.display)
+                                    IconView(iconName: item.icon)
+                                }
+                            }
+                        }
+                    }, label: {
+                        Image(systemName: "line.3.horizontal")
+                    })
+                    
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    
+                    Menu(content: {
+                        
+                        if self.menuEnum != .statistics {
+                            Picker("DeviceEnum", selection: $deviceEnum.animation()) {
+                                ForEach(DeviceEnum.allCases, id: \.self) { item in
+                                    MenuItem(item.display.pluralize, item.icon)
+                                }
+                            }
+                        }
+                        
+                        if self.showLibraryItems {
+                            Picker("ViewEnum", selection: $viewEnum.animation()) {
+                                ForEach(ViewEnum.allCases, id: \.self) { item in
+                                    MenuItem(item.display, item.icon)
+                                }
+                            }
+                        }
+                        
+                        Picker("SortEnum", selection: sortBinding.animation()) {
+                            ForEach(SortEnum.allCases, id:\.self) { item in
+                                MenuItem(item.display, item == self.sortEnum ? "chevron.\(self.ascending ? "up" : "down")" : nil)
+                            }
+                        }
+                        
+                    }, label: {
+                        Image(systemName: "ellipsis.circle")
+                    })
+                    
+                }
+                
+                if self.showLibraryItems {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        
+                        Button(action: {
+                            withAnimation {
+                                self.isFilterActivated ? self.selected.reset() : self.popover.toggle()
+                            }
+                        }, label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle\( self.isFilterActivated ? ".fill" : .empty )")
+                        })
+                        
+                        NavigationLink(destination: {
+                            DeviceBuilderView(self.deviceEnum)
+                        }, label: {
+                            Image(systemName: "plus")
+                        })
+                        
+                    }
+                }
+                
+                ToolbarItem(placement: .status) {
+                    if self.isFilterActivated {
+                        VStack(alignment: .center, spacing: 0) {
+                            Text("Filtered by:")
+                            Button(action: {
+                                self.popover.toggle()
+                            }, label: {
+                                Text(self.selectedDisplay)
+                            })
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    private func delete(_ offsets: IndexSet) -> Void {
+        if let index: Int = offsets.first {
+            self.delete(self.items[index])
+        }
+    }
+    
+    private func delete(_ del: Device) -> Void {
+        let t: String = "Confirm delete \(self.deviceEnum.id)"
+        let m: String = "Are you sure you want to delete \(del.shorthand)?"
+        let primary: Alert.Button = .destructive(Text("Yes"), action: {
+            withAnimation {
+                self.viewContext.remove(del)
+            }
+        })
+        self.alert.toggle(t, m, primary, .cancel(Text("No")))
+    }
+    
+}
+
+// MARK: - COMPUTED VARIABLES
+
+extension ContentView {
+    
     private var showLibraryItems: Bool {
         self.menuEnum == .library
     }
@@ -63,6 +206,19 @@ struct ContentView: View {
         return self.menuEnum == .statistics ? display : "\(self.deviceEnum.display) \(display)"
     }
     
+    private var isFilterActivated: Bool {
+        self.selected.activated
+    }
+    
+    private var selectedDisplay: String {
+        let maxLength: Int = Int(appScreenWidth / 12)
+        let str: String = self.selected.display
+        let ret: String = str.count > maxLength ? "\(str.prefix(maxLength))..."  : str
+        let gen: PropertyFilter = .input(.generation)
+        return self.selected.pf == gen ? "\(ret) \(gen.display)" : ret
+        
+    }
+    
     private var items: [Device] {
         
         let key: String = self.search.stripped
@@ -88,117 +244,18 @@ struct ContentView: View {
         var ret = opts.sorted(by: action)
         ret = self.ascending ? ret : ret.reversed()
         
+        if self.isFilterActivated {
+            ret = ret.filter { $0.properties.contains(where: { $0.value == self.selected.id }) }
+        }
+        
         return ret
         
     }
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                
-                switch self.menuEnum {
-                case .statistics:
-                    Text("tbd")
-                default:
-                    LibraryView
-                }
-            }
-            .alert(isPresented: $alert.show) {
-                self.alert.generateAlert
-            }
-            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
-            .navigationTitle(self.title)
-            .popover(isPresented: $popover) {
-                PropertyFilterView($deviceEnum)
-            }
-            .toolbar {
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    
-                    Menu(content: {
-                        Picker("Menu picker", selection: $menuEnum) {
-                            ForEach(MenuEnum.allCases, id:\.self) { item in
-                                HStack {
-                                    Text(item.display)
-                                    IconView(iconName: item.icon)
-                                }
-                            }
-                        }
-                    }, label: {
-                        Image(systemName: "line.3.horizontal")
-                    })
-                    
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    
-                    Menu(content: {
-                        
-                        if self.menuEnum != .statistics {
-                            Picker("DeviceEnum", selection: $deviceEnum) {
-                                ForEach(DeviceEnum.allCases, id: \.self) { item in
-                                    MenuItem(item.display.pluralize, item.icon)
-                                }
-                            }
-                        }
-                        
-                        if self.showLibraryItems {
-                            Picker("ViewEnum", selection: $viewEnum) {
-                                ForEach(ViewEnum.allCases, id: \.self) { item in
-                                    MenuItem(item.display, item.icon)
-                                }
-                            }
-                        }
-                        
-                        Picker("SortEnum", selection: sortBinding) {
-                            ForEach(SortEnum.allCases, id:\.self) { item in
-                                MenuItem(item.display, item == self.sortEnum ? "chevron.\(self.ascending ? "up" : "down")" : nil)
-                            }
-                        }
-                        
-                    }, label: {
-                        Image(systemName: "ellipsis.circle")
-                    })
-                    
-                }
-                
-                if self.showLibraryItems {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        
-                        Button(action: {
-                            self.popover.toggle()
-                        }, label: {
-                            Image(systemName: "line.3.horizontal.decrease.circle\( self.filter.isEmpty ? .empty : ".fill" )")
-                        })
-                        
-                        NavigationLink(destination: {
-                            DeviceBuilderView(self.deviceEnum)
-                        }, label: {
-                            Image(systemName: "plus")
-                        })
-                        
-                    }
-                }
-                
-                ToolbarItem(placement: .status) {
-                    if !self.filter.isEmpty {
-                        Text("Filtered by:\n\(self.filter)")
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                
-            }
-        }
-    }
-    
-    @State private var popover: Bool = false
-    @State private var filter: String = .empty
-    
-    private func delete(_ offsets: IndexSet) -> Void {
-        if let index: Int = offsets.first {
-            self.viewContext.remove(self.items[index])
-        }
-    }
+}
+
+// MARK: - VIEW BUILDERS
+
+extension ContentView {
     
     @ViewBuilder
     public var LibraryView: some View {
@@ -214,7 +271,15 @@ struct ContentView: View {
                         NavigationLink(destination: {
                             DeviceView(device: item)
                         }, label: {
-                            DeviceListView(item)
+                            VStack(alignment:. leading, spacing: 5) {
+                                Text(item.name)
+                                    .fontWeight(.bold)
+                                HStack(spacing: 8) {
+                                    IconView(iconName: "calendar", iconColor: .pink)
+                                    Text(item.release.dashes)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         })
                     }.onDelete(perform: delete)
                 case .icons:
@@ -228,19 +293,6 @@ struct ContentView: View {
                         }
                     }
                 }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func DeviceListView(_ device: Device) -> some View {
-        VStack(alignment:. leading, spacing: 5) {
-            Text(device.name)
-                .fontWeight(.bold)
-            HStack(spacing: 8) {
-                IconView(iconName: "calendar")
-                Text(device.release.dashes)
-                    .foregroundColor(.gray)
             }
         }
     }
@@ -269,22 +321,44 @@ struct ContentView: View {
     
     @ViewBuilder
     private func DeviceIconView(_ device: Device) -> some View {
-        VStack {
-            Image(device.image)
-                .resizable()
-                .scaledToFit()
-                .cornerRadius(12)
-            
-            Text(device.shorthand)
-                .multilineTextAlignment(.center)
-                .lineLimit(nil)
-                .foregroundColor(.blue)
-        }
+
+        FormButton(action: { }, label: {
+            VStack {
+                Image(device.image)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(12)
+                    .foregroundColor(.white)
+                
+                Text(device.shorthand)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .foregroundColor(.white)
+                    .bold()
+            }
+            .onTapGesture {
+                self.iconDevice = device
+            }
+            .onLongPressGesture {
+                self.delete(device)
+            }
+        })
         .padding()
-        .background(.white)
+        .background(.pink)
         .cornerRadius(12)
         .frame(maxWidth: ( appScreenWidth / 2 ) - 50)
+        .onChange(of: self.iconDevice) { self.iconShow = $0 != nil }
+        .navigationDestination(isPresented: $iconShow) {
+            if let d: Device = self.iconDevice {
+                DeviceView(device: d)
+                    .onDisappear {
+                        self.iconDevice = nil
+                    }
+            }
+        }
+        
     }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
@@ -294,3 +368,5 @@ struct ContentView_Previews: PreviewProvider {
             .environmentObject(AlertObjectKey.defaultValue)
     }
 }
+
+

@@ -293,7 +293,11 @@ extension Device {
                 ["st", "rd", "th"].forEach {
                     s = s.replacingOccurrences(of: $0, with: "")
                 }
-                self.container.insert(.generation, Int(s)!.formatted, self.deviceEnum)
+                
+                if let int: Int = Int(s) {
+                    self.container.insert(.generation, int.formatted, self.deviceEnum)
+                }
+                
                 return self
             }
             
@@ -313,6 +317,10 @@ extension Device {
         
         
     }
+    
+}
+
+extension Device {
     
     public static func compareByName(lhs: Device, rhs: Device) -> Bool {
         let l: String = lhs.name.stripped
