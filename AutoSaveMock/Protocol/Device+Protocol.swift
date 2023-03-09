@@ -8,27 +8,26 @@
 import Foundation
 import SwiftUI
 
-protocol BuilderProtocol {
+public protocol DeviceProtocol { }
 
-}
+public protocol BuilderProtocol { }
 
-protocol BuilderObjectProtocol: BuilderProtocol, ObservableObject {
+extension DeviceProtocol {
     
-    
-}
-
-protocol BuilderViewProtocol: BuilderProtocol, View {
-    
-}
-
-extension BuilderObjectProtocol {
-    
-    
+    @ViewBuilder
+    public func SingleView(_ a: String, _ b: String) -> some View {
+        HStack {
+            Text(a)
+                .foregroundColor(.gray)
+            Spacer()
+            Text(b)
+                .multilineTextAlignment(.trailing)
+        }
+    }
     
 }
 
 extension BuilderProtocol {
-    
     
     @ViewBuilder
     public func FormButton(action: @escaping () -> Void, @ViewBuilder label: () -> some View) -> some View {

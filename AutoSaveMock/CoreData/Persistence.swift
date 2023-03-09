@@ -63,7 +63,8 @@ struct PersistenceController {
             
             Device.Builder.Game(.unowned)
                 .withName("\(DeviceEnum.game.display) \(id)")
-                .withRelease(Date.random)
+                .withRelease(.random)
+                .withAdded(.random)
                 .build(viewContext)
         }
         
@@ -80,22 +81,22 @@ struct PersistenceController {
             .withDeveloper("Sony Computer Entertainment")
             .build(viewContext)
         
-        Device.Builder.Game()
-             .withName("Grand Theft Auto: Vice City")
-             .withRelease(2002, 10, 29)
-             .withImage(imgData)
-             .withSeries("Grand Theft Auto")
-             .withMode(.single)
-             .withGenre("Action-Adventure")
-             .withPublisher("Rockstar Games")
-             .withDeveloper("Rockstar North")
-             .withFormat(.disc, platform)
-             .build(viewContext)
+//        Device.Builder.Game()
+//             .withName("Grand Theft Auto: Vice City")
+//             .withRelease(2002, 10, 29)
+//             .withImage(imgData)
+//             .withSeries("Grand Theft Auto")
+//             .withMode(.single)
+//             .withGenre("Action-Adventure")
+//             .withPublisher("Rockstar Games")
+//             .withDeveloper("Rockstar North")
+//             .withFormat(.disc, platform)
+//             .build(viewContext)
         
-        Device.Builder.Game(.unowned)
-             .withName("foobar")
-             .withRelease(.today)
-             .build(viewContext)
+//        Device.Builder.Game(.unowned)
+//             .withName("foobar")
+//             .withRelease(.today)
+//             .build(viewContext)
         
         return result
     }()

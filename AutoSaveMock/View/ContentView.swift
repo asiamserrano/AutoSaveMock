@@ -8,12 +8,12 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: BuilderViewProtocol {
+struct ContentView: View, BuilderProtocol, DeviceProtocol {
     
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var alert: AlertObject
     
-    @State private var menuEnum: MenuEnum = .wishlist
+    @State private var menuEnum: MenuEnum = .statistics
     @State private var viewEnum: ViewEnum = .list
     @State private var deviceEnum: DeviceEnum = .game
     @State private var sortEnum: SortEnum = .name
@@ -24,6 +24,8 @@ struct ContentView: BuilderViewProtocol {
     @State private var iconShow: Bool = false
     @State private var mode: EditMode = .inactive
     
+    @State private var refresh: Bool = false
+    
     @StateObject private var selected: PropertyFilterView.FilterObservable = .init()
     
     
@@ -31,30 +33,18 @@ struct ContentView: BuilderViewProtocol {
         NavigationStack {
             VStack {
                 switch self.menuEnum {
-                case .statistics:
-                    Text("statistics")
-                case .wishlist:
-                    List {
-                        ForEach(self.items) { item in
-                            NavigationLink(destination: {
-                                WishlistBuilderView(item)
-                            }, label: {
-                                Text(item.name)
-                            })
-                        }.onDelete(perform: self.delete)
-                    }
-                case .library:
-                    LibraryView
+                case .statistics: StatisticsView
+                default:
+                    ListView.onDisappear { self.selected.reset() }
+                        .onAppear {
+                            self.refresh.toggle()
+                        }
                 }
             }
-            .alert(isPresented: $alert.show) {
-                self.alert.generateAlert
-            }
-            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .automatic)).disabled(self.disabled)
+            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always)).disabled(self.disabled)
+            .alert(isPresented: $alert.show) { self.alert.generateAlert }
             .navigationTitle(self.title)
-            .popover(isPresented: $popover) {
-                PropertyFilterView($deviceEnum, self.selected)
-            }
+            .popover(isPresented: $popover) { PropertyFilterView($deviceEnum, self.selected) }
             .toolbar {
                 
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -70,7 +60,9 @@ struct ContentView: BuilderViewProtocol {
                         }
                     }, label: {
                         Image(systemName: "line.3.horizontal")
-                    })
+                    }).onChange(of: self.menuEnum) { _ in
+                        self.selected.reset()
+                    }
                     
                 }
                 
@@ -83,7 +75,7 @@ struct ContentView: BuilderViewProtocol {
                                 ForEach(DeviceEnum.allCases, id: \.self) { item in
                                     MenuItem(item.display.pluralize, item.icon)
                                 }
-                            }
+                            }.onChange(of: self.deviceEnum) { _ in self.selected.reset() }
                         }
                         
                         if self.showLibraryItems {
@@ -116,7 +108,7 @@ struct ContentView: BuilderViewProtocol {
                                 }
                             }, label: {
                                 Image(systemName: "line.3.horizontal.decrease.circle\( self.isFilterActivated ? ".fill" : .empty )")
-                            })
+                            }).disabled(self.disabled)
                             
                             NavigationLink(destination: {
                                 DeviceBuilderView(self.deviceEnum)
@@ -126,12 +118,12 @@ struct ContentView: BuilderViewProtocol {
                         } else {
                             
                             withAnimation {
-                                EditButton()
+                                EditButton().disabled(self.disabled)
                             }
                             
                             Spacer()
                             
-                            if !self.mode.isEditing {
+                            if self.isNotEditing {
                                 NavigationLink(destination: {
                                     WishlistBuilderView(self.deviceEnum)
                                 }, label: {
@@ -189,6 +181,10 @@ struct ContentView: BuilderViewProtocol {
 // MARK: - COMPUTED VARIABLES
 
 extension ContentView {
+    
+    private var isNotEditing: Bool {
+        self.mode == .inactive
+    }
     
     private var showLibraryItems: Bool {
         self.menuEnum == .library
@@ -278,6 +274,7 @@ extension ContentView {
         return ret
         
     }
+
 }
 
 // MARK: - VIEW BUILDERS
@@ -285,41 +282,110 @@ extension ContentView {
 extension ContentView {
     
     @ViewBuilder
-    public var LibraryView: some View {
+    private func CalendarIconView(_ regular: Bool) -> some View {
+        let width: CGFloat = regular ? 18 : 20
+        let height: CGFloat = regular ? 16 : 20
+        Image(systemName: "calendar\(regular ? .empty : ".badge.plus")")
+            .resizable()
+            .scaledToFit()
+            .frame(width: width, height: height)
+            .foregroundColor(appSecondaryColor)
+    }
+    
+    @ViewBuilder
+    private func DateTextView(_ dt: Date, _ b: Bool) -> some View {
+        let x = Text(dt.dashes).foregroundColor(.gray)
+        b ? x : x.italic()
+    }
+    
+    @ViewBuilder
+    private func DateView(_ dt: Date, _ bool: Bool = true) -> some View {
+        let a = CalendarIconView(bool)
+        let b = DateTextView(dt, bool)
+        HStack(spacing: 8) {
+            if bool { a;b } else { b;a }
+        }
+    }
+    
+    @ViewBuilder
+    private func DeviceListView(_ item: Device) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(item.name)
+                .fontWeight(.bold)
+            let dt_view = DateView(item.release)
+            switch item.status_enum {
+            case .owned:
+                dt_view
+            case .unowned:
+                HStack {
+                    dt_view
+                    Spacer()
+                    if self.isNotEditing { DateView(item.added, false) }
+                }
+            }
+            
+        }
+    }
+    
+    @ViewBuilder
+    public var ListView: some View {
         if self.disabled || self.items.isEmpty {
-            Text(self.disabled ? "Add a \(self.deviceEnum.id) with the plus button!" : "No results found")
+            Text(self.disabled ? "Add a \(self.deviceEnum.id) to your \(self.menuEnum.id)!" : "No results found")
                 .italic()
                 .foregroundColor(.gray)
         } else {
-            List {
-                switch self.viewEnum {
-                case .list:
-                    ForEach(self.items) { item in
-                        NavigationLink(destination: {
-                            DeviceView(device: item)
-                        }, label: {
-                            VStack(alignment:. leading, spacing: 5) {
-                                Text(item.name)
-                                    .fontWeight(.bold)
-                                HStack(spacing: 8) {
-                                    IconView(iconName: "calendar", iconColor: .pink)
-                                    Text(item.release.dashes)
-                                        .foregroundColor(.gray)
+            ScrollViewReader { scrollView in
+                EmptyView()
+                    .tag(InputEnum.abbrv)
+                List {
+                    if self.menuEnum == .library {
+                        switch self.viewEnum {
+                        case .list:
+                            ForEach(self.items) { item in
+                                NavigationLink(destination: {
+                                    DeviceView(device: item)
+                                }, label: {
+                                    DeviceListView(item)
+                                })
+                            }.onDelete(perform: delete)
+                        case .icons:
+                            HStack(alignment: .top) {
+                                if self.items.count > 1 {
+                                    IconViewSide(true)
+                                    IconViewSide(false)
+                                } else {
+                                    DeviceIconView(self.items.first!)
+                                    Spacer()
                                 }
-                            }
-                        })
-                    }.onDelete(perform: delete)
-                case .icons:
-                    HStack(alignment: .top) {
-                        if self.items.count > 1 {
-                            IconViewSide(true)
-                            IconViewSide(false)
-                        } else {
-                            DeviceIconView(self.items.first!)
-                            Spacer()
+                            }.onAppear { self.iconDevice = nil }
                         }
-                    }.onAppear { self.iconDevice = nil }
+                    } else {
+                        ForEach(self.items) { item in
+                            NavigationLink(destination: {
+                                WishlistBuilderView(item)
+                            }, label: {
+                                DeviceListView(item)
+                            })
+                        }.onDelete(perform: self.delete)
+                    }
                 }
+                .onChange(of: self.deviceEnum) { _ in
+                    scrollView.scrollTo(InputEnum.abbrv, anchor: .top)
+                }
+                .onChange(of: self.menuEnum) { _ in
+                    scrollView.scrollTo(InputEnum.abbrv, anchor: .top)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var StatisticsView: some View {
+        List {
+            Section(MenuEnum.library.display) {
+                SingleView(DeviceEnum.game.display.pluralize, self.items
+                    .filter { $0.device_enum == .game && $0.status_enum == .owned }
+                    .count.description)
             }
         }
     }
@@ -367,7 +433,7 @@ extension ContentView {
             .onLongPressGesture { self.delete(device) }
         })
         .padding()
-        .background(.pink)
+        .background(appSecondaryColor)
         .cornerRadius(12)
         .frame(maxWidth: ( appScreenWidth / 2 ) - 50)
         .onChange(of: self.iconDevice) { self.iconShow = $0 != nil }

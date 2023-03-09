@@ -13,42 +13,46 @@ struct WishlistBuilderView: BuilderViewProtocol {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var alert: AlertObject
     
-    @State private var name: String = .empty
-    @State private var release: Date = .today
-    @State private var added: Date = .today
-    
-    let builder: Device.Builder
+    @ObservedObject private var wishlist: WishlistObservable
     
     init(_ d: DeviceEnum) {
-        self.builder = {
-            switch d {
-           case .game:
-               return Device.Builder.Game(.unowned)
-           case .platform:
-               return Device.Builder.Platform(.unowned)
-           }
-        }()
+        self.wishlist = WishlistObservable(d)
     }
     
     init(_ d: Device) {
-        self._name = State(initialValue: d.name)
-        self._release = State(initialValue: d.release)
-        self._added = State(initialValue: d.added)
-        self.builder = d.builder
+        self.wishlist = WishlistObservable(d)
     }
     
+    private var deviceEnum: DeviceEnum {
+        self.wishlist.deviceEnum
+    }
+    
+    private var disabled: Bool {
+        self.wishlist.disabled
+    }
+    
+    private var isNew: Bool {
+        self.wishlist.device == nil
+    }
+    
+    private var title: String {
+        "\(self.isNew ? "Add" : "Edit") wishlist \(self.deviceEnum.id)"
+    }
     
     var body: some View {
         Form {
             
-            Section { SingleView($name, .name) }
-
+            Section { SingleView($wishlist.name, .name) }
+            
             Section {
-                DatePicker(selection: $release, displayedComponents: .date) {
+                DatePicker(selection: $wishlist.release, displayedComponents: .date) {
                     Text("Release Date")
                 }
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationTitle(self.title)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             
             ToolbarItem(placement: .navigationBarLeading) {
@@ -59,59 +63,96 @@ struct WishlistBuilderView: BuilderViewProtocol {
                 })
             }
             
-//            ToolbarItem(placement: .navigationBarTrailing) {
-//                Button(action: {
-//                    let ret: Device? = self.viewContext.exists(self.builder)
-//
-//
-//                    let old: Device? = self.device.device
-//                    let builder: Device.Builder = self.device.builder
-//                    let ret: Device? = self.viewContext.exists(builder)
-//                    let enumStr: String = self.deviceEnum.display
-//                    let title: String = isNew ? "created" : "edited"
-//                    let end: String = isNew ? "added" : "updated"
-//                    let c: Alert.Button = .cancel(Text("Okay"))
-//
-//                    if ret == nil || ret == old {
-//
-//                        var wish: Int {
-//                            [
-//                                builder.name,
-//                                builder.release.dashless,
-//                                StatusEnum.unowned.id,
-//                                builder.deviceEnum.id
-//                            ].id.hashed
-//                        }
-//
-//                        let new: Device = self.viewContext.build(builder, old)
-//                        let a: String = "\(enumStr) \(title)"
-//                        let b: String = "\(new.shorthand) has been sucessfully \(end)!"
-//
-//                        if let wishlist: Device = self.viewContext.exists(wish) {
-//                            let primary: Alert.Button = .default(Text("Yes"), action: {
-//                                self.viewContext.remove(wishlist)
-//                            })
-//                            self.alert.toggle(a, "\(b) Remove from wishlist?", primary, .cancel(Text("No")))
-//                        } else {
-//                            self.alert.toggle(a, b, c)
-//                        }
-//                    } else {
-//                        self.alert.toggle("Unable to \(self.mode)", "\(ret!.shorthand) already exists!", c)
-//                    }
-//
-//                    self.dismiss()
-//                }, label: {
-//                    Text("Done")
-//                }).disabled(self.device.disableDone)
-//            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                    let old: Device? = self.wishlist.device
+                    let builder: Device.Builder = self.wishlist.builder
+                    let ret: Device? = self.viewContext.exists(builder)
+                    let enumStr: String = self.deviceEnum.id
+                    let title: String = isNew ? "created" : "edited"
+                    let end: String = isNew ? "added" : "updated"
+                    let c: Alert.Button = .cancel(Text("Okay"))
+                    
+                    if ret == nil || ret == old {
+                        let new: Device = self.viewContext.build(builder, old)
+                        let a: String = "Wishlist \(enumStr) \(title)"
+                        let b: String = "\(new.shorthand) has been sucessfully \(end)!"
+                        self.alert.toggle(a, b, c)
+                    } else {
+                        self.alert.toggle("Unable to \(self.isNew ? "add" : "edit")", "\(ret!.shorthand) already exists!", c)
+                    }
+                    
+                    self.dismiss()
+                }, label: {
+                    Text("Done")
+                }).disabled(self.disabled)
+            }
             
         }
     }
     
 }
 
-//struct WishlistBuilderView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        WishlistBuilderView()
-//    }
-//}
+extension WishlistBuilderView {
+    
+    class WishlistObservable: BuilderObjectProtocol {
+        @Published var name: String
+        @Published var release: Date
+        
+        let added: Date
+        let deviceEnum: DeviceEnum
+        let device: Device?
+        
+        init(_ d: DeviceEnum) {
+            self.name = .empty
+            self.release = .today
+            self.added = .today
+            self.deviceEnum = d
+            self.device = nil
+        }
+        
+        init(_ d: Device) {
+            self.name = d.name
+            self.release = d.release
+            self.added = d.added
+            self.deviceEnum = d.device_enum
+            self.device = d
+        }
+        
+        var identity: Int {
+            [
+                self.name,
+                self.release.dashless,
+                StatusEnum.unowned.id,
+                self.deviceEnum.id
+            ].id.hashed
+        }
+        
+        var disabled: Bool {
+            if let dev: Device = self.device {
+                return dev.identity == self.identity
+            } else {
+                return self.name.trimmed.isEmpty
+            }
+        }
+        
+        var builder: Device.Builder {
+            let nm: String = self.name.trimmed
+            switch self.deviceEnum {
+            case .game:
+                return Device.Builder.Game(.unowned)
+                    .withName(nm)
+                    .withRelease(self.release)
+                    .withAdded(self.added)
+            case .platform:
+                return Device.Builder.Platform(.unowned)
+                    .withName(nm)
+                    .withRelease(self.release)
+                    .withAdded(self.added)
+            }
+        }
+        
+        
+    }
+}

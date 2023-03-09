@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DeviceView: View {
+struct DeviceView: View, DeviceProtocol {
     
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var alert: AlertObject
@@ -140,17 +140,6 @@ struct DeviceView: View {
             
         }
         
-    }
-    
-    @ViewBuilder
-    public func SingleView(_ a: String, _ b: String) -> some View {
-        HStack {
-            Text(a)
-                .foregroundColor(.gray)
-            Spacer()
-            Text(b)
-                .multilineTextAlignment(.trailing)
-        }
     }
     
     @ViewBuilder
