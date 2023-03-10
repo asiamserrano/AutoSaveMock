@@ -10,6 +10,7 @@ import Foundation
 public protocol EnumProtocol: TriadProtocol, CaseIterable, Comparable {
     
     var display: String { get }
+    var plural: String { get }
     
 }
 
@@ -19,12 +20,17 @@ public extension EnumProtocol {
         s.id.capitalized
     }
     
+    static func getPlural(_ s: Self) -> String {
+        s.display
+    }
+    
     init(_ str: String) {
         self = str.isEmpty ? Self.allCases.first! : Self.allCases.first(where: { $0.equals(str) } )!
     }
     
     var id: String { String(describing: self) }
     var display: String { Self.getDisplay(self) }
+    var plural: String { Self.getPlural(self) }
     
     var random: String {
         "\(self.display) \(String(format: "%04d", Int.random(in: 0...9999)))"

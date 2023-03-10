@@ -13,7 +13,7 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var alert: AlertObject
     
-    @State private var menuEnum: MenuEnum = .statistics
+    @State private var menuEnum: MenuEnum = .library
     @State private var viewEnum: ViewEnum = .list
     @State private var deviceEnum: DeviceEnum = .game
     @State private var sortEnum: SortEnum = .name
@@ -23,9 +23,7 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
     @State private var iconDevice: Device? = nil
     @State private var iconShow: Bool = false
     @State private var mode: EditMode = .inactive
-    
-    @State private var refresh: Bool = false
-    
+        
     @StateObject private var selected: PropertyFilterView.FilterObservable = .init()
     
     
@@ -35,13 +33,11 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
                 switch self.menuEnum {
                 case .statistics: StatisticsView
                 default:
-                    ListView.onDisappear { self.selected.reset() }
-                        .onAppear {
-                            self.refresh.toggle()
-                        }
+                    ListView
+                        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always)).disabled(self.disabled)
+//                        .onDisappear { self.selected.reset() }
                 }
             }
-            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always)).disabled(self.disabled)
             .alert(isPresented: $alert.show) { self.alert.generateAlert }
             .navigationTitle(self.title)
             .popover(isPresented: $popover) { PropertyFilterView($deviceEnum, self.selected) }
@@ -67,34 +63,47 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    
-                    Menu(content: {
+                    if self.menuEnum != .statistics {
                         
-                        if self.menuEnum != .statistics {
+                        Menu(content: {
+                            
                             Picker("DeviceEnum", selection: $deviceEnum.animation()) {
                                 ForEach(DeviceEnum.allCases, id: \.self) { item in
                                     MenuItem(item.display.pluralize, item.icon)
                                 }
                             }.onChange(of: self.deviceEnum) { _ in self.selected.reset() }
-                        }
-                        
-                        if self.showLibraryItems {
-                            Picker("ViewEnum", selection: $viewEnum.animation()) {
-                                ForEach(ViewEnum.allCases, id: \.self) { item in
-                                    MenuItem(item.display, item.icon)
+                            
+                            
+                            if self.showLibraryItems {
+                                Picker("ViewEnum", selection: $viewEnum.animation()) {
+                                    ForEach(ViewEnum.allCases, id: \.self) { item in
+                                        MenuItem(item.display, item.icon)
+                                    }
                                 }
                             }
-                        }
-                        
-                        Picker("SortEnum", selection: sortBinding.animation()) {
-                            ForEach(SortEnum.allCases, id:\.self) { item in
-                                MenuItem(item.display, item == self.sortEnum ? "chevron.\(self.ascending ? "up" : "down")" : nil)
+                            
+                            Picker("SortEnum", selection: sortBinding.animation()) {
+                                ForEach(SortEnum.allCases, id:\.self) { item in
+                                    MenuItem(item.display, item == self.sortEnum ? "chevron.\(self.ascending ? "up" : "down")" : nil)
+                                }
                             }
-                        }
-                        
-                    }, label: {
-                        Image(systemName: "ellipsis.circle")
-                    })
+                            
+                        }, label: {
+                            Image(systemName: "ellipsis.circle")
+                        })
+                    }
+                    
+//                    else {
+//
+//                        Button(action: {
+//                            let t: String = "Reset AutoSave libaries?"
+//                            let m: String = "Are you sure you want to delete all data?"
+//                            self.alert.toggle(t,m, .cancel(), .destructive(Text("Confirm"), action: { self.viewContext.resetLibrary() }))
+//                        }, label: {
+//                            Text("Reset")
+//                        })
+//                        .foregroundColor(.red)
+//                    }
                     
                 }
                 
@@ -380,13 +389,44 @@ extension ContentView {
     }
     
     @ViewBuilder
-    private var StatisticsView: some View {
-        List {
-            Section(MenuEnum.library.display) {
-                SingleView(DeviceEnum.game.display.pluralize, self.items
-                    .filter { $0.device_enum == .game && $0.status_enum == .owned }
-                    .count.description)
+    private func SectionForNonInput(_ arr: [any EnumProtocol], _ a: any EnumProtocol) -> some View {
+        Section(a.plural) {
+            ForEach(arr, id:\.id) { item in
+                let filter: String = self.viewContext.getCountByPropertyValue(item)
+                SingleView(item.plural, filter)
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var StatisticsView: some View {
+        
+        List {
+            
+            ForEach(DeviceEnum.allCases) { device in
+                Section(device.display.pluralize) {
+                    let menus: [MenuEnum] = [.library, .wishlist]
+                    ForEach(menus) { menu in
+                        let status: StatusEnum = menu == .library ? .owned : .unowned
+                        let filtered: [Device] = self.items.filter { $0.device_enum == device && $0.status_enum == status }
+                        SingleView(menu.display, filtered.count.description)
+                    }
+                }
+            }
+            
+            ForEach(DeviceEnum.allCases) { device in
+                Section("\(device.id) properties") {
+                    ForEach(device.inputs) { input in
+                        SingleView(input.plural, self.viewContext.filterProperties(device, input.id).count.description)
+                    }
+                }
+            }
+        
+            SectionForNonInput(ModeEnum.allCases, SelectionEnum.mode)
+            SectionForNonInput(TypeEnum.allCases, SelectionEnum.type)
+            SectionForNonInput(PhysicalEnum.allCases, FormatEnum.physical)
+            SectionForNonInput(DigitalEnum.allCases, FormatEnum.digital)
+       
         }
     }
     

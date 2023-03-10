@@ -61,6 +61,11 @@ extension MOC {
         return self.executeFetchRequest(fetchRequest)
     }
     
+//    public func resetLibrary() -> Void {
+//        self.remov
+////        self.createFetchRequest(.Device).forEach(self.remove)
+//    }
+    
     public func build(_ builder: Property.Builder) -> Property {
 
         if let first: NSManagedObject = self.createFetchRequest(.Property, builder.identity).first {
@@ -106,14 +111,34 @@ extension MOC {
         return device
     }
     
-    public func getDevice(_ builder: Device.Builder) -> Device? {
-        if let first: NSManagedObject = self.createFetchRequest(.Device, builder.identity).first {
-            if let device: Device = first as? Device {
-                return device
-            }
+    public func getCountByPropertyValue(_ a: any EnumProtocol) -> String {
+        var ret: Int = 0
+        let id: String = a.id
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Property")
+        fetchRequest.predicate = NSPredicate(format: "value_str == %@", id)
+        
+        let results: ManagedObjects = self.executeFetchRequest(fetchRequest)
+        
+        if DigitalEnum.contains(id) || PhysicalEnum.contains(id) {
+            ret = Set(results.flatMap { ($0 as! Property ).devices.map { $0.name } }).count
         }
         
-        return nil
+        else {
+            
+            if let first: NSManagedObject = results.first {
+                if let property: Property = first as? Property {
+                    ret = property.devices.count//.map { $0.name } //
+                    
+    //                if let bucket: NSSet = property.bucket_set {
+    //                    return  bucket.map { ($0 as! Device).name }//.devices.map { $0.name }
+    //                }
+                   
+                }
+            }
+            
+        }
+        
+        return ret.description
     }
     
     public func filterProperties(_ device: DeviceEnum, _ type_str: String) -> [Property] {

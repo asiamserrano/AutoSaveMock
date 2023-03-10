@@ -178,6 +178,15 @@ public enum DeviceEnum: EnumProtocol {
             return 1
         }
     }
+    
+    var inputs: [InputEnum] {
+        switch self {
+        case .game:
+            return [.series, .developer, .publisher, .genre] 
+        case .platform:
+            return [.family, .developer, .manufacturer, .generation]
+        }
+    }
 
 }
 
@@ -227,6 +236,16 @@ public enum TypeEnum: EnumProtocol {
             return Self.getDisplay(self)
         }
     }
+    
+    public var plural: String {
+        switch self {
+        case .handheld, .hybrid:
+            return self.display
+        default:
+            return Self.getPlural(self)
+        }
+    }
+    
 }
 
 public enum InputEnum: EnumProtocol {
@@ -259,6 +278,17 @@ public enum InputEnum: EnumProtocol {
             return DeviceEnum.platform.index
         }
     }
+    
+    public var plural: String {
+        switch self {
+        case .family:
+            return "Families"
+        case .series:
+            return self.display
+        default:
+            return self.display.pluralize
+        }
+    }
 
 }
 
@@ -273,6 +303,8 @@ public enum SelectionEnum: EnumProtocol {
             return DeviceEnum.platform.index
         }
     }
+    
+    public var plural: String { "\(self == .mode ? DeviceEnum.game : DeviceEnum.platform) \(self.display)".pluralize }
 
 }
 
@@ -288,6 +320,8 @@ public enum FormatEnum: EnumProtocol {
             return "arrow.down.circle.fill"
         }
     }
+    
+    public var plural: String { "\(self.display) format".pluralize }
 
 }
 
@@ -317,5 +351,7 @@ public enum DigitalEnum: EnumProtocol {
             return Self.getDisplay(self)
         }
     }
+    
+    public var plural: String { "\(self.display) format".pluralize }
     
 }
