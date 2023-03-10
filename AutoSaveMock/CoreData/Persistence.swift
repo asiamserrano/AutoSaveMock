@@ -93,10 +93,10 @@ struct PersistenceController {
 //             .withFormat(.disc, platform)
 //             .build(viewContext)
         
-//        Device.Builder.Game(.unowned)
-//             .withName("foobar")
-//             .withRelease(.today)
-//             .build(viewContext)
+        Device.Builder.Game(.owned)
+             .withName("foobar")
+             .withRelease(.today)
+             .build(viewContext)
         
         return result
     }()

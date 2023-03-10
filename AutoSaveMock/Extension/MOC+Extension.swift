@@ -127,12 +127,7 @@ extension MOC {
             
             if let first: NSManagedObject = results.first {
                 if let property: Property = first as? Property {
-                    ret = property.devices.count//.map { $0.name } //
-                    
-    //                if let bucket: NSSet = property.bucket_set {
-    //                    return  bucket.map { ($0 as! Device).name }//.devices.map { $0.name }
-    //                }
-                   
+                    ret = property.devices.count
                 }
             }
             

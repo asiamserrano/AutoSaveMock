@@ -131,7 +131,7 @@ extension WishlistBuilderView {
         
         var disabled: Bool {
             if let dev: Device = self.device {
-                return dev.identity == self.identity
+                return dev.identity == self.identity && dev.name === self.name
             } else {
                 return self.name.trimmed.isEmpty
             }

@@ -29,6 +29,10 @@ extension String {
         lhs.hashed == rhs.hashed
     }
     
+    public static func === (lhs: Self, rhs: Self) -> Bool {
+        Array(lhs.trimmed) == Array(rhs.trimmed)
+    }
+    
     public static func |= (left: inout Self, right: Self) {
         left = right.trimmed
     }

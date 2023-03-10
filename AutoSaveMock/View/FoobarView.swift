@@ -63,23 +63,9 @@ struct FoobarView: View {
     @State private var foo: FoobarEnum = .a
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                if self.foo == .a { AView() } else { BView() }
-            }
-            .navigationTitle("This is a title")
-            .toolbar {
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        withAnimation {
-                            self.foo = self.foo == .a ? .b : .a
-                        }
-                    }, label: {
-                        Text("toggle foo")
-                    })
-                }
-            }
+        VStack {
+            Text("bool: \(("hello" == "Hello").description)")
+            Text("bool: \(("hello" === "Hello").description)")
         }
     }
 }

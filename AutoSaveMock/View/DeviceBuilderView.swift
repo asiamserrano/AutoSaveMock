@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct DeviceBuilderView: BuilderViewProtocol {
     
@@ -13,28 +14,28 @@ struct DeviceBuilderView: BuilderViewProtocol {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var alert: AlertObject
     
-    @ObservedObject var device: DeviceObservable
+    @StateObject var device: DeviceObservable
     
     init(_ deviceEnum: DeviceEnum) {
-        self.device = {
+        self._device = StateObject(wrappedValue: {
             switch deviceEnum {
             case .game:
                 return GameObservable()
             case .platform:
                 return PlatformObservable()
             }
-        }()
+        }())
     }
     
     init(_ device: Device) {
-        self.device = {
+        self._device = StateObject(wrappedValue: {
             switch device.device_enum {
             case .game:
                 return GameObservable(device)
             case .platform:
                 return PlatformObservable(device)
             }
-        }()
+        }())
     }
     
     private var deviceEnum: DeviceEnum {
@@ -49,26 +50,62 @@ struct DeviceBuilderView: BuilderViewProtocol {
         self.isNew ? "Add" : "Edit"
     }
     
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var selectedImageData: Data? = nil
+
+    
     var body: some View {
         
         Form {
             
             CenteredSectionView {
+            
+                if let selectedImageData, let uiImage = UIImage(data: selectedImageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
+                        .padding()
+              
+                    
+                } else {
+                    Image(systemName: "photo.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: appScreenWidth, alignment: .center)
+                        .foregroundColor(.gray)
+                        .padding()
+                }
+                
 
-                DeviceImageView($device.uiimage)
-                    .popover(isPresented: $device.imagePicker) {
-                        ImagePicker(selectedImage: $device.uiimage)
-                    }
+              
+                
+//                DeviceImageView($device.uiimage)
+//                    .popover(isPresented: $device.imagePicker) {
+//                        ImagePicker(selectedImage: $device.uiimage)
+//                    }
 
                 HStack {
 
                     let bool: Bool = self.device.uiimage.isEmpty
 
-                    FormButton(action: {
-                        self.device.imagePicker.toggle()
-                    }, label: {
+//                    FormButton(action: {
+//                        self.device.imagePicker.toggle()
+//                    }, label: {
+//                        Text(bool ? "Add" : "Edit" )
+//                    })
+                    
+                    PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                         Text(bool ? "Add" : "Edit" )
-                    })
+                    }
+                    .onChange(of: self.selectedItem) { newItem in
+                        Task {
+                            if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                self.selectedImageData = data
+                            }
+                        }
+                    }
 
                     if !bool {
                         FormButton(action: {
@@ -240,7 +277,11 @@ extension DeviceBuilderView {
         
         var disableDone: Bool {
             if let dev: Device = self.device {
-                return self.builder == dev && self.builder == Property.Container(dev) && self.builder == dev.image
+                if self.builder == dev && self.builder == Property.Container(dev) && self.builder == dev.image {
+                    return self.builder.name === dev.name
+                } else {
+                    return false
+                }
             } else {
                 return self.name.stripped.isEmpty
             }
