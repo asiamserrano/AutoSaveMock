@@ -16,7 +16,12 @@ struct DeviceBuilderView: BuilderViewProtocol {
     
     @StateObject var device: DeviceObservable
     
+    @State private var selectedItem: PhotosPickerItem? = nil
+    
+    private let isNew: Bool
+    
     init(_ deviceEnum: DeviceEnum) {
+        self.isNew = true
         self._device = StateObject(wrappedValue: {
             switch deviceEnum {
             case .game:
@@ -27,7 +32,8 @@ struct DeviceBuilderView: BuilderViewProtocol {
         }())
     }
     
-    init(_ device: Device) {
+    init(_ device: Device, _ wish: Bool = false) {
+        self.isNew = wish
         self._device = StateObject(wrappedValue: {
             switch device.device_enum {
             case .game:
@@ -42,59 +48,47 @@ struct DeviceBuilderView: BuilderViewProtocol {
         self.device.deviceEnum
     }
     
-    private var isNew: Bool {
-        self.device.device == nil
+    private var old: Device? {
+        self.device.device
+    }
+    
+    private var isOldNil: Bool {
+        self.old == nil
+    }
+    
+    private var isMoving: Bool {
+        self.isNew && !isOldNil
     }
     
     private var mode: String {
         self.isNew ? "Add" : "Edit"
     }
     
-    @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var selectedImageData: Data? = nil
-
-    
     var body: some View {
         
         Form {
             
             CenteredSectionView {
-            
-                if let selectedImageData, let uiImage = UIImage(data: selectedImageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(10)
-                        .shadow(radius: 10)
-                        .padding()
-              
-                    
-                } else {
+                
+                if self.device.uiimage.isEmpty {
                     Image(systemName: "photo.circle.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: appScreenWidth, alignment: .center)
                         .foregroundColor(.gray)
                         .padding()
+                } else {
+                    Image(uiImage: self.device.uiimage)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
+                        .padding()
                 }
                 
-
-              
-                
-//                DeviceImageView($device.uiimage)
-//                    .popover(isPresented: $device.imagePicker) {
-//                        ImagePicker(selectedImage: $device.uiimage)
-//                    }
-
                 HStack {
 
                     let bool: Bool = self.device.uiimage.isEmpty
-
-//                    FormButton(action: {
-//                        self.device.imagePicker.toggle()
-//                    }, label: {
-//                        Text(bool ? "Add" : "Edit" )
-//                    })
                     
                     PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                         Text(bool ? "Add" : "Edit" )
@@ -102,7 +96,8 @@ struct DeviceBuilderView: BuilderViewProtocol {
                     .onChange(of: self.selectedItem) { newItem in
                         Task {
                             if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                                self.selectedImageData = data
+                                self.device.uiimage = UIImage(data)
+                                
                             }
                         }
                     }
@@ -121,7 +116,7 @@ struct DeviceBuilderView: BuilderViewProtocol {
 
             Section {
 
-                SingleView($device.name, .name)
+                SingleView($device.name, .name).disabled(self.isMoving)
 
                 if let plat: PlatformObservable = self.device as? PlatformObservable {
                     PlatformAbbrvView(plat)
@@ -129,7 +124,7 @@ struct DeviceBuilderView: BuilderViewProtocol {
 
                 DatePicker(selection: $device.release, displayedComponents: .date) {
                     Text("Release Date")
-                }
+                }.disabled(self.isMoving)
 
                 switch self.deviceEnum {
                 case .game:
@@ -173,13 +168,14 @@ struct DeviceBuilderView: BuilderViewProtocol {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    let old: Device? = self.device.device
-                    let builder: Device.Builder = self.device.builder
-                    let ret: Device? = self.viewContext.exists(builder)
+                    
+                    var builder: Device.Builder = self.device.builder
+                    
                     let enumStr: String = self.deviceEnum.display
-                    let title: String = isNew ? "created" : "edited"
-                    let end: String = isNew ? "added" : "updated"
+                    let title: String = isNew ? isOldNil ? "created" : "moved" : "edited"
+                    let end: String = isNew ? "added to your library" : "updated"
                     let c: Alert.Button = .cancel(Text("Okay"))
+                    let ret: Device? = self.viewContext.exists(builder)
                     
                     if ret == nil || ret == old {
                         
@@ -192,18 +188,21 @@ struct DeviceBuilderView: BuilderViewProtocol {
                             ].id.hashed
                         }
                         
+                        if isMoving { builder = builder.withAdded(.today) }
+                        
                         let new: Device = self.viewContext.build(builder, old)
                         let a: String = "\(enumStr) \(title)"
-                        let b: String = "\(new.shorthand) has been sucessfully \(end)!"
+                        let b: String = "\(new.shorthand) has been sucessfully \(end)"
                         
-                        if let wishlist: Device = self.viewContext.exists(wish) {
-                            let primary: Alert.Button = .default(Text("Yes"), action: {
+                        var b1: String {
+                            if let wishlist: Device = self.viewContext.exists(wish) {
                                 self.viewContext.remove(wishlist)
-                            })
-                            self.alert.toggle(a, "\(b) Remove from wishlist?", primary, .cancel(Text("No")))
-                        } else {
-                            self.alert.toggle(a, b, c)
+                                return " and will be removed from your wishlist!"
+                            } else { return isMoving ? " and removed from your wishlist!" : "!" }
                         }
+                        
+                        self.alert.toggle(a, b + b1, c)
+                        
                     } else {
                         self.alert.toggle("Unable to \(self.mode)", "\(ret!.shorthand) already exists!", c)
                     }

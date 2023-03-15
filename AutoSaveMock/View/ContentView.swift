@@ -14,7 +14,7 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
     @EnvironmentObject var alert: AlertObject
     
     @State private var menuEnum: MenuEnum = .library
-    @State private var viewEnum: ViewEnum = .list
+    @State private var viewEnum: ViewEnum = .icons
     @State private var deviceEnum: DeviceEnum = .game
     @State private var sortEnum: SortEnum = .name
     @State private var ascending: Bool = true
@@ -22,6 +22,10 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
     @State private var popover: Bool = false
     @State private var iconDevice: Device? = nil
     @State private var iconShow: Bool = false
+    @State private var wishlistDevice: Device? = nil
+    @State private var wishlistShow: Bool = false
+    @State private var contextDevice: Device? = nil
+    @State private var contextShow: Bool = false
     @State private var mode: EditMode = .inactive
         
     @StateObject private var selected: PropertyFilterView.FilterObservable = .init()
@@ -32,10 +36,7 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
             VStack {
                 switch self.menuEnum {
                 case .statistics: StatisticsView
-                default:
-                    ListView
-                        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always)).disabled(self.disabled)
-//                        .onDisappear { self.selected.reset() }
+                default: ListView.searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always)).disabled(self.disabled)
                 }
             }
             .alert(isPresented: $alert.show) { self.alert.generateAlert }
@@ -183,6 +184,22 @@ struct ContentView: View, BuilderProtocol, DeviceProtocol {
             self.alert.toggle(t, m, primary, .cancel(Text("No")))
         }
         
+    }
+    
+    private func moveToWishlist(_ device: Device) -> Void {
+        let primary: Alert.Button = .default(Text("Yes"), action: {
+            var builder: Device.Builder {
+                switch device.device_enum {
+                case .game: return Device.Builder.Game(.unowned).withName(device.name).withRelease(device.release).withAdded(.today)
+                case .platform: return Device.Builder.Platform(.unowned).withName(device.name).withRelease(device.release).withAdded(.today)
+                }
+            }
+            let _ : Device = self.viewContext.build(builder, device)
+        })
+        
+        let a: String = "Confirm move to wishlist"
+        let b: String = "Are you sure you want to move \(device.shorthand) to your wishlist?"
+        self.alert.toggle(a, b, primary, .cancel(Text("No")))
     }
     
 }
@@ -344,8 +361,7 @@ extension ContentView {
                 .foregroundColor(.gray)
         } else {
             ScrollViewReader { scrollView in
-                EmptyView()
-                    .tag(InputEnum.abbrv)
+                EmptyView().tag(1)
                 List {
                     if self.menuEnum == .library {
                         switch self.viewEnum {
@@ -355,6 +371,13 @@ extension ContentView {
                                     DeviceView(device: item)
                                 }, label: {
                                     DeviceListView(item)
+                                        .swipeActions(edge: .leading) {
+                                            Button {
+                                                self.moveToWishlist(item)
+                                            } label: {
+                                                Text("Move to\nWishlist").multilineTextAlignment(.center)
+                                            }.tint(.green)
+                                        }
                                 })
                             }.onDelete(perform: delete)
                         case .icons:
@@ -374,16 +397,40 @@ extension ContentView {
                                 WishlistBuilderView(item)
                             }, label: {
                                 DeviceListView(item)
+                                    .swipeActions(edge: .leading) {
+                                        Button {
+                                            self.wishlistDevice = item
+                                        } label: {
+                                            Text("Move to\nLibrary").multilineTextAlignment(.center)
+                                        }.tint(.green)
+                                    }
                             })
-                        }.onDelete(perform: self.delete)
+                        }.onDelete(perform: delete)
                     }
                 }
-                .onChange(of: self.deviceEnum) { _ in
-                    scrollView.scrollTo(InputEnum.abbrv, anchor: .top)
+                .onAppear { self.wishlistDevice = nil }
+                .onChange(of: self.deviceEnum) { _ in scrollView.scrollTo(1, anchor: .top) }
+                .onChange(of: self.menuEnum) { _ in scrollView.scrollTo(1, anchor: .top) }
+                .onChange(of: self.wishlistDevice) { self.wishlistShow = $0 != nil }
+                .onChange(of: self.contextDevice) { self.contextShow = $0 != nil }
+                .onChange(of: self.contextShow) { if $0 == false { self.contextDevice = nil } }
+                .navigationDestination(isPresented: $wishlistShow) { if let d: Device = self.wishlistDevice { DeviceBuilderView(d, true) } }
+                .actionSheet(isPresented: $contextShow) {
+                    ActionSheet(title: Text(self.contextDevice?.shorthand ?? .empty), buttons: [
+                        .default(Text("Move to Wishlist"), action: {
+                            if let device: Device = self.contextDevice {
+                                self.moveToWishlist(device)
+                            }
+                        }),
+                        .destructive(Text("Delete"), action: {
+                            if let device: Device = self.contextDevice {
+                                self.delete(device)
+                            }
+                        }),
+                        .cancel()
+                    ])
                 }
-                .onChange(of: self.menuEnum) { _ in
-                    scrollView.scrollTo(InputEnum.abbrv, anchor: .top)
-                }
+                
             }
         }
     }
@@ -470,7 +517,8 @@ extension ContentView {
                     .bold()
             }
             .onTapGesture { self.iconDevice = device }
-            .onLongPressGesture { self.delete(device) }
+            .onLongPressGesture { self.contextDevice = device }
+//            .onLongPressGesture { self.delete(device) }
         })
         .padding()
         .background(appSecondaryColor)

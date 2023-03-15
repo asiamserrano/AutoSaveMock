@@ -70,16 +70,16 @@ struct PersistenceController {
         
         
         
-        let platform: Device = Device.Builder.Platform()
-            .withName("PlayStation 2")
-            .withRelease(2000, 10, 26)
-            .withType(.console)
-            .withAbbrv("PS2")
-            .withFamily("PlayStation")
-            .withGeneration(6)
-            .withManufacturer("Sony Electronics")
-            .withDeveloper("Sony Computer Entertainment")
-            .build(viewContext)
+//        let platform: Device = Device.Builder.Platform()
+//            .withName("PlayStation 2")
+//            .withRelease(2000, 10, 26)
+//            .withType(.console)
+//            .withAbbrv("PS2")
+//            .withFamily("PlayStation")
+//            .withGeneration(6)
+//            .withManufacturer("Sony Electronics")
+//            .withDeveloper("Sony Computer Entertainment")
+//            .build(viewContext)
         
 //        Device.Builder.Game()
 //             .withName("Grand Theft Auto: Vice City")
@@ -94,9 +94,21 @@ struct PersistenceController {
 //             .build(viewContext)
         
         Device.Builder.Game(.owned)
-             .withName("foobar")
-             .withRelease(.today)
-             .build(viewContext)
+            .withName("Foobar")
+            .withRelease(.random)
+            .withAdded(.random)
+            .build(viewContext)
+        
+        Device.Builder.Game(.owned)
+            .withName("Foobar1")
+            .withRelease(.today)
+            .withAdded(.today)
+            .build(viewContext)
+        
+//        Device.Builder.Game(.unowned)
+//             .withName("foobar")
+//             .withRelease(.today)
+//             .build(viewContext)
         
         return result
     }()

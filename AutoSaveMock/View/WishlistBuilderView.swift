@@ -75,10 +75,37 @@ struct WishlistBuilderView: BuilderViewProtocol {
                     let c: Alert.Button = .cancel(Text("Okay"))
                     
                     if ret == nil || ret == old {
-                        let new: Device = self.viewContext.build(builder, old)
-                        let a: String = "Wishlist \(enumStr) \(title)"
-                        let b: String = "\(new.shorthand) has been sucessfully \(end)!"
-                        self.alert.toggle(a, b, c)
+                        
+                        var o: Int {
+                            [
+                                builder.name,
+                                builder.release.dashless,
+                                StatusEnum.owned.id,
+                                builder.deviceEnum.id
+                            ].id.hashed
+                        }
+                        
+                        @discardableResult
+                        func build() -> Device {
+                            self.viewContext.build(builder, old)
+                        }
+                        
+                        if let owned: Device = self.viewContext.exists(o) {
+                            let primary: Alert.Button = .default(Text("Yes"), action: {
+                                self.viewContext.remove(owned)
+                                build()
+                            })
+                            let a: String = "Confirm wishlist \(isNew ? "add" : "update")"
+                            let b: String = "\(owned.shorthand) is currently in your library. Remove and add to wishlist?"
+                            self.alert.toggle(a, b, primary, .cancel(Text("No")))
+                        } else {
+                            let new: Device = build()
+                            let a: String = "Wishlist \(enumStr) \(title)"
+                            let b: String = "\(new.shorthand) has been sucessfully \(end)!"
+                            self.alert.toggle(a, b, c)
+                        }
+                        
+                        
                     } else {
                         self.alert.toggle("Unable to \(self.isNew ? "add" : "edit")", "\(ret!.shorthand) already exists!", c)
                     }
