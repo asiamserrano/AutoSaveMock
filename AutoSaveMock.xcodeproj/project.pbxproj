@@ -28,6 +28,26 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		62BEA4A22F27F42D00C75F69 /* Protocol */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		62BEA4A32F27F43700C75F69 /* Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		62BEA4A42F27F44200C75F69 /* Enum */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Enum;
+			sourceTree = "<group>";
+		};
+		62F155542F2819CD00E6979D /* Struct */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Struct;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +81,10 @@
 			isa = PBXGroup;
 			children = (
 				62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */,
+				62F155542F2819CD00E6979D /* Struct */,
+				62BEA4A42F27F44200C75F69 /* Enum */,
+				62BEA4A32F27F43700C75F69 /* Extension */,
+				62BEA4A22F27F42D00C75F69 /* Protocol */,
 				62BEA3CC2F27F2EE00C75F69 /* Model */,
 				62BEA3CB2F27F2E500C75F69 /* View */,
 				62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */,
@@ -86,6 +110,10 @@
 			fileSystemSynchronizedGroups = (
 				62BEA3CB2F27F2E500C75F69 /* View */,
 				62BEA3CC2F27F2EE00C75F69 /* Model */,
+				62BEA4A22F27F42D00C75F69 /* Protocol */,
+				62BEA4A32F27F43700C75F69 /* Extension */,
+				62BEA4A42F27F44200C75F69 /* Enum */,
+				62F155542F2819CD00E6979D /* Struct */,
 			);
 			name = AutoSaveMock;
 			packageProductDependencies = (
