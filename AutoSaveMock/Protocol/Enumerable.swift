@@ -7,66 +7,14 @@
 
 import Foundation
 
-enum Foobar: Enumerable {
-    case a, b, c
-    
-    var rawValue: String {
-        switch self {
-        case .a: "aaa"
-        case .b: "bbb"
-        case .c: "ccc"
-        }
-    }
-    
-    var signature: String {
-        switch self {
-        case .a: "aaa"
-        case .b: "bbb"
-        case .c: "ccc"
-        }
-    }
-}
-
-
-
-public struct Enumeror: Indexable, Representable {
-    
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        if lhs.className == rhs.className {
-            return lhs.index < rhs.index
-        } else {
-            return lhs.className < rhs.className
-        }
-    }
-
-    private let enumerable: any Enumerable
-    
-    public init(_ e: any Enumerable) {
-        self.enumerable = e
-    }
-    
-    public var id: String { self.enumerable.id }
-    public var description: String { self.enumerable.description }
-    public var rawValue: String { self.enumerable.rawValue }
-    public var index: Int { self.enumerable.index }
-    public var className: String { self.enumerable.className }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-        hasher.combine(self.description)
-        hasher.combine(self.rawValue)
-        hasher.combine(self.index)
-        hasher.combine(self.className)
-    }
-    
-}
-//public typealias Enumeror = Enumerable.Enumeror
 
 public protocol Enumerable: Iterable {
-//    typealias Enumeror = any Enumerable
+    static var enumerors: [Enumeror] { get }
 }
 
 public extension Enumerable {
+    
+    static var enumerors: [Enumeror] { Self.cases.enumerors }
     
     static func contains(_ enumeror: Enumeror) -> Bool {
         Self.convert(enumeror) != nil
@@ -96,4 +44,12 @@ public extension Enumerable {
         }
     }
      
+}
+
+extension Array where Element:Enumerable {
+    
+    public var enumerors: [Enumeror] {
+        self.map { .init($0) }
+    }
+    
 }

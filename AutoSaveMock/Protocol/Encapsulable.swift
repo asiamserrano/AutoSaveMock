@@ -13,6 +13,8 @@ public protocol Encapsulable: Enumerable {
 
 extension Encapsulable {
     
+    public static var enumerors: [Enumeror] { Self.cases.map { $0.enumeror } }
+    
     public var id: String {
         self.enumeror.id
     }

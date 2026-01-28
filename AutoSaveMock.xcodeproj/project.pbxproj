@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		62BEA3C72F27F2BF00C75F69 /* AutoSaveMockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */; };
 		62BEA3CA2F27F2C000C75F69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */; };
+		62F16BCB2F292BFD00443B06 /* TestFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F16BCA2F292BFD00443B06 /* TestFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		62BEA3B22F27F2B200C75F69 /* AutoSaveMock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoSaveMock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSaveMockApp.swift; sourceTree = "<group>"; };
+		62F16BCA2F292BFD00443B06 /* TestFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -81,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */,
+				62F16BCA2F292BFD00443B06 /* TestFile.swift */,
 				62F155542F2819CD00E6979D /* Struct */,
 				62BEA4A42F27F44200C75F69 /* Enum */,
 				62BEA4A32F27F43700C75F69 /* Extension */,
@@ -172,6 +175,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62F16BCB2F292BFD00443B06 /* TestFile.swift in Sources */,
 				62BEA3C72F27F2BF00C75F69 /* AutoSaveMockApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

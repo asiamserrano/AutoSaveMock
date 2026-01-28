@@ -13,33 +13,36 @@ struct ContentView: View {
     
     @Query private var items: [Item]
     
-    @State var system: SystemBuilder? = nil
-    @State var format: FormatBuilder? = nil
+//    @State var system: SystemBuilder? = nil
+//    @State var format: FormatBuilder? = nil
     
     var body: some View {
         NavigationStack {
             Form {
-                if let s: SystemBuilder = self.system, let f: FormatBuilder = self.format {
-                    
-                    Text("system: \(s.rawValue)")
-                    Text("format: \(f.rawValue)")
-                    Divider()
-                    if let m: PlatformBuilder = .init(s, f) {
-                        Text("is valid: \(m.rawValue)")
-                    } else {
-                        Text("is not valid")
-                    }
+                ForEach(FormatBuilder.enumerors) { en in
+                    Text(en.rawValue)
                 }
+//                if let s: SystemBuilder = self.system, let f: FormatBuilder = self.format {
+//                    
+//                    Text("system: \(s.rawValue)")
+//                    Text("format: \(f.rawValue)")
+//                    Divider()
+//                    if let m: PlatformBuilder = .init(s, f) {
+//                        Text("is valid: \(m.rawValue)")
+//                    } else {
+//                        Text("is not valid")
+//                    }
+//                }
             }
             .toolbar {
                 
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    Button("Set") {
-                        let m: PlatformBuilder = .random
-                        self.system = m.system
-                        self.format = m.format
-                    }
-                })
+//                ToolbarItem(placement: .topBarTrailing, content: {
+//                    Button("Set") {
+//                        let m: PlatformBuilder = .random
+//                        self.system = m.system
+//                        self.format = m.format
+//                    }
+//                })
                 
             }
         }
