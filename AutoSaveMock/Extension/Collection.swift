@@ -7,11 +7,15 @@
 
 import Foundation
 
-//extension Collection {
-//    
+extension Collection {
+    
 //    var isNotEmpty: Bool {
 //        self.count > 0
 //    }
-//    
-//}
+    
+    var optional: Self? {
+        self.isEmpty ? nil : self
+    }
+    
+}
 

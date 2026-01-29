@@ -17,8 +17,8 @@ public struct Enumeror: Protocolable, Representable {
 
     public let enumerable: _Enumerable
     
-    public init(_ e: _Enumerable) {
-        self.enumerable = e
+    public init(enumerable: _Enumerable) {
+        self.enumerable = enumerable
     }
     
     public var id: String { self.enumerable.id }

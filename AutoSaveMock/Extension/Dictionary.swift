@@ -1,12 +1,20 @@
-////
-////  Dictionary.swift
-////  autosave
-////
-////  Created by Asia Serrano on 6/21/25.
-////
 //
-//import Foundation
+//  Dictionary.swift
+//  autosave
 //
+//  Created by Asia Serrano on 6/21/25.
+//
+
+import Foundation
+
+extension Dictionary where Key: Comparable {
+    
+    public var elements: [Self.Element] {
+        self.sorted(by: { $0.key < $1.key })
+    }
+    
+}
+
 //extension Dictionary: Defaultable {
 //    
 //    public static var defaultValue: Self { .init() }

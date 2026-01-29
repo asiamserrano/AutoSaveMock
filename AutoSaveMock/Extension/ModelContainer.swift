@@ -13,6 +13,7 @@ extension ModelContainer {
     private convenience init(memory: Bool) {
         do {
             let schema: Schema = .init([
+                Game.self, Property.self, Platform.self,
                 Item.self
             ])
             let config: ModelConfiguration = .init(schema: schema, isStoredInMemoryOnly: memory)

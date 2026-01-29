@@ -8,6 +8,14 @@
 import Foundation
 import SwiftData
 
+extension Collection where Element: Hashable, Element: Comparable {
+    
+    public func subset(_ len: Int) -> [Self.Element] {
+        self.shuffled().prefix(len).sorted()
+    }
+    
+}
+
 extension Array {
     
     public init(_ elements: Element...) {
@@ -63,8 +71,8 @@ extension Array: Defaultable {
 //    
 //}
 //
-//public extension Array where Element: Hashable {
-//    
+public extension Array where Element: Hashable {
+    
 //    static func -(lhs: Self, rhs: Self) -> Self {
 //        lhs.filter { rhs.lacks($0) }
 //    }
@@ -77,15 +85,15 @@ extension Array: Defaultable {
 //        self.filter { $0 != element }
 //    }
 //    
-//    var toSet: Set<Element> {
-//        .init(self)
-//    }
-//    
+    var toSet: Set<Element> {
+        .init(self)
+    }
+    
 //    func lacks(_ element: Element) -> Bool {
 //        !self.contains(element)
 //    }
-//    
-//}
+    
+}
 //
 //extension Array where Element == any PersistentModel.Type {
 //    

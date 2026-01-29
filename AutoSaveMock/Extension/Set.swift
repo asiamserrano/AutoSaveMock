@@ -7,7 +7,19 @@
 
 import Foundation
 
+extension Array where Element:Collection, Element.Element: Hashable {
+    
+    public var flatten: Set<Element.Element> {
+        Set(self.flatMap(\.self))
+    }
+    
+}
+
 extension Set {
+    
+    public init(_ elements: Element...) {
+        self = .init([Element].init(elements))
+    }
     
     public static func +(lhs: Self, rhs: Self) -> Self {
         var new: Self = lhs

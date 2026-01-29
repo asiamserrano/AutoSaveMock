@@ -19,10 +19,12 @@ public enum ConstantEnum: Enumerable {
     case delete
     case edit
     case add
+    case game
     case property
-    case properties
     case platform
     case games
+    case properties
+    case platforms
     
     public var rawValue: String {
         self.description.replacingOccurrences(of: "_", with: " ").capitalized

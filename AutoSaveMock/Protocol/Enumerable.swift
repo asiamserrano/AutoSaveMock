@@ -43,13 +43,17 @@ public extension Enumerable {
             fatalError("Unable to parse enumeror: \(enumeror)")
         }
     }
+    
+    var toEnumeror: Enumeror {
+        .init(enumerable: self)
+    }
      
 }
 
-extension Array where Element:Enumerable {
+extension Array where Element: Enumerable {
     
     public var enumerors: [Enumeror] {
-        self.map { .init($0) }
+        self.map(\.toEnumeror)
     }
     
 }

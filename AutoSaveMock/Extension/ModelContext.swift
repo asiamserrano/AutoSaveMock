@@ -1,12 +1,35 @@
-////
-////  ModelContext.swift
-////  autosave
-////
-////  Created by Asia Michelle Serrano on 5/7/25.
-////
 //
-//import Foundation
-//import SwiftData
+//  ModelContext.swift
+//  autosave
+//
+//  Created by Asia Michelle Serrano on 5/7/25.
+//
+
+import Foundation
+import SwiftData
+
+extension ModelContext {
+    
+    public func _insert(_ model: any PersistentModel) {
+        self.insert(model)
+        self._save()
+    }
+    
+    public func _delete(_ model: any PersistentModel) {
+        self.delete(model)
+        self._save()
+    }
+    
+    private func _save() {
+        do {
+            try self.save()
+        } catch let error {
+            fatalError("error saving in model context: \(error.localizedDescription)")
+        }
+    }
+    
+}
+
 //
 //extension ModelContext {
 //    
