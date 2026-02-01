@@ -7,12 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E2071E22F2FF6A60072D300 /* Platform+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2071E12F2FF6A60072D300 /* Platform+Model.swift */; };
+		1E4A78F22F2ADE47008162C6 /* ModelClassLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4A78F12F2ADE47008162C6 /* ModelClassLoader.swift */; };
+		1E4A78F62F2BF274008162C6 /* Model+Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4A78F52F2BF274008162C6 /* Model+Protocol.swift */; };
+		1EA57EE42F2D08D00055E4EE /* Game+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA57EE02F2D08D00055E4EE /* Game+Model.swift */; };
+		1EA57EE52F2D08D00055E4EE /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA57EE12F2D08D00055E4EE /* Item.swift */; };
+		1EA57EE62F2D08D00055E4EE /* Property+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA57EE22F2D08D00055E4EE /* Property+Model.swift */; };
 		62BEA3C72F27F2BF00C75F69 /* AutoSaveMockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */; };
 		62BEA3CA2F27F2C000C75F69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */; };
 		62F16BCB2F292BFD00443B06 /* TestFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F16BCA2F292BFD00443B06 /* TestFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1E2071E12F2FF6A60072D300 /* Platform+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Platform+Model.swift"; sourceTree = "<group>"; };
+		1E4A78F12F2ADE47008162C6 /* ModelClassLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelClassLoader.swift; sourceTree = "<group>"; };
+		1E4A78F52F2BF274008162C6 /* Model+Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Model+Protocol.swift"; sourceTree = "<group>"; };
+		1EA57EE02F2D08D00055E4EE /* Game+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Model.swift"; sourceTree = "<group>"; };
+		1EA57EE12F2D08D00055E4EE /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		1EA57EE22F2D08D00055E4EE /* Property+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Property+Model.swift"; sourceTree = "<group>"; };
 		62BEA3B22F27F2B200C75F69 /* AutoSaveMock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoSaveMock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSaveMockApp.swift; sourceTree = "<group>"; };
@@ -23,11 +35,6 @@
 		62BEA3CB2F27F2E500C75F69 /* View */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = View;
-			sourceTree = "<group>";
-		};
-		62BEA3CC2F27F2EE00C75F69 /* Model */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Model;
 			sourceTree = "<group>";
 		};
 		62BEA4A22F27F42D00C75F69 /* Protocol */ = {
@@ -63,6 +70,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1EA57EE32F2D08D00055E4EE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				1EA57EE02F2D08D00055E4EE /* Game+Model.swift */,
+				1EA57EE22F2D08D00055E4EE /* Property+Model.swift */,
+				1E2071E12F2FF6A60072D300 /* Platform+Model.swift */,
+				1EA57EE12F2D08D00055E4EE /* Item.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		62BEA3A92F27F2B200C75F69 = {
 			isa = PBXGroup;
 			children = (
@@ -84,11 +102,13 @@
 			children = (
 				62BEA3C32F27F2BF00C75F69 /* AutoSaveMockApp.swift */,
 				62F16BCA2F292BFD00443B06 /* TestFile.swift */,
+				1E4A78F12F2ADE47008162C6 /* ModelClassLoader.swift */,
+				1E4A78F52F2BF274008162C6 /* Model+Protocol.swift */,
 				62F155542F2819CD00E6979D /* Struct */,
 				62BEA4A42F27F44200C75F69 /* Enum */,
 				62BEA4A32F27F43700C75F69 /* Extension */,
 				62BEA4A22F27F42D00C75F69 /* Protocol */,
-				62BEA3CC2F27F2EE00C75F69 /* Model */,
+				1EA57EE32F2D08D00055E4EE /* Model */,
 				62BEA3CB2F27F2E500C75F69 /* View */,
 				62BEA3C22F27F2BF00C75F69 /* Assets.xcassets */,
 			);
@@ -112,7 +132,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				62BEA3CB2F27F2E500C75F69 /* View */,
-				62BEA3CC2F27F2EE00C75F69 /* Model */,
 				62BEA4A22F27F42D00C75F69 /* Protocol */,
 				62BEA4A32F27F43700C75F69 /* Extension */,
 				62BEA4A42F27F44200C75F69 /* Enum */,
@@ -175,8 +194,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1EA57EE42F2D08D00055E4EE /* Game+Model.swift in Sources */,
+				1EA57EE52F2D08D00055E4EE /* Item.swift in Sources */,
+				1EA57EE62F2D08D00055E4EE /* Property+Model.swift in Sources */,
 				62F16BCB2F292BFD00443B06 /* TestFile.swift in Sources */,
+				1E4A78F62F2BF274008162C6 /* Model+Protocol.swift in Sources */,
+				1E4A78F22F2ADE47008162C6 /* ModelClassLoader.swift in Sources */,
 				62BEA3C72F27F2BF00C75F69 /* AutoSaveMockApp.swift in Sources */,
+				1E2071E22F2FF6A60072D300 /* Platform+Model.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

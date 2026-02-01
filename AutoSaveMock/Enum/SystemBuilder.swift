@@ -169,8 +169,8 @@ extension SystemBuilder {
         digitalBuilders.union(physicalBuilder)
     }
     
-    public var platformBuilders: PlatformBuilder.Cases {
-        self.formatBuilders.compactMap { .init(self, $0) }
+    public var platformBuilders: Platform.Builder.Cases {
+        self.formatBuilders.compactMap { .init(system: self, format: $0) }
     }
     
 }

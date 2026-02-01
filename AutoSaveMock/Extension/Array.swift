@@ -31,12 +31,16 @@ extension Array {
     }
     
     public func union(_ elements: Element...) -> Self {
+        self.union(elements.map(\.self))
+    }
+    
+    public func union(_ other: Self) -> Self {
         var new: Self = .init()
-        new.append(contentsOf: elements)
+        new.append(contentsOf: other)
         new.append(contentsOf: self)
         return new
     }
-    
+        
 }
 
 extension Array: Defaultable {

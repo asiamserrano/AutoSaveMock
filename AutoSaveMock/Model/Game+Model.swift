@@ -11,7 +11,9 @@ import SwiftData
 @Model
 public final class Game: ModelProtocol {
     
-    public struct Builder: Identifiable, Hashable, Comparable, Equatable, Representable {
+    public struct Builder: ModelBuilderProtocol {
+        
+        public typealias Model = Game
         
         public static var random: Self {
             .init(.init(), .random, .random, .random(), nil, .now)
@@ -41,13 +43,13 @@ public final class Game: ModelProtocol {
             self.added = a
         }
         
-        public init(game: Game) {
-            self.id = game.uuid
-            self.title = game.title_rawValue
-            self.release = .fromString(game.release_date)
-            self.status = game.status_bool
-            self.boxart = game.boxart_data
-            self.added = game.added
+        public init(model: Model) {
+            self.id = model.uuid
+            self.title = model.title_rawValue
+            self.release = .fromString(model.release_date)
+            self.status = model.status_bool
+            self.boxart = model.boxart_data
+            self.added = model.added
         }
         
         public func hash(into hasher: inout Hasher) {
@@ -83,14 +85,14 @@ public final class Game: ModelProtocol {
         self.boxart_data = boxart
     }
     
-    public convenience init(builder: Builder) {
-        self.init(uuid: builder.id, title: builder.title, release: builder.release, status: builder.status, boxart: builder.boxart, added: builder.added)
-    }
-    
     private convenience init(uuid: UUID) {
         self.init(uuid: uuid, title: .defaultValue, release: .defaultValue)
     }
     
+    public convenience init(builder: Builder) {
+        self.init(uuid: builder.id, title: builder.title, release: builder.release, status: builder.status, boxart: builder.boxart, added: builder.added)
+    }
+        
     @Relationship(inverse: \Property.games)
     public var properties: [Property] = [] // Initialize array to prevent potential bugs
     @Relationship(inverse: \Platform.games)
@@ -100,7 +102,7 @@ public final class Game: ModelProtocol {
         self.init(uuid: .init(), title: .random, release: .random, status: .random())
     }
     
-    public var builder: Builder { .init(game: self) }
+    public var builder: Builder { .init(model: self) }
 
     public var rawValue: String {
         self.builder.rawValue
@@ -114,144 +116,23 @@ public final class Game: ModelProtocol {
         self.propertiesCount == 0 || self.platformsCount < 2 || self.totalCount < 6
     }
     
-    public func insert(_ model: ModelBuilder) -> Void {
-        if let property: Property = model.property {
-            self.properties.append(property)
-        } else if let platform: Platform = model.platform {
-            self.platforms.append(platform)
-        }
-    }
+//    public func insert(_ model: any ModelProtocol) -> Void {
+//        if let property: Property = model.property {
+//            self.properties.append(property)
+//        } else if let platform: Platform = model.platform {
+//            self.platforms.append(platform)
+//        }
+//    }
     
 }
 
-@Model
-public final class Property: ModelProtocol {
-    
-    public static var random: Property {
-        .init(uuid: .init(), type: .random, value: .string(.random))
-    }
-    
-    public enum TypeEnum: Encapsulable {
-        
-        public static var allCases: Cases {
-            InputEnum.cases.map { Self.input($0) }.union(.mode, .system, .format)
-        }
-        
-        public static func fromBuilder(_ builder: PropertyBuilder) -> Self {
-            switch builder {
-            case .input(let i): return .input(i.type)
-            case .mode: return .mode
-            case .system: return .system
-            case .format: return .format
-            }
-        }
-        
-        case input(InputEnum)
-        case mode, system, format
-        
-        public var property: PropertyEnum {
-            switch self {
-            case .input: return .input
-            case .mode: return .mode
-            case .system: return .system
-            case .format: return .format
-            }
-        }
-        
-        public var enumeror: Enumeror {
-            switch self {
-            case .input(let i): return i.toEnumeror
-            default: return self.property.toEnumeror
-            }
-        }
-        
-    }
-    
-    public private(set) var uuid: UUID
-    public private(set) var type_id: String
-    public private(set) var value_id: String
-    public private(set) var value_rawValue:  String
-    
-    public private(set) var games: [Game] = []
 
-    private init(uuid: UUID, type: TypeEnum, value: ValueBuilder) {
-        self.uuid = uuid
-        self.type_id = type.id
-        self.value_id = value.id
-        self.value_rawValue = value.rawValue
-    }
-    
-    public convenience init(_ builder: PropertyBuilder, _ id: UUID = .init()) {
-        self.init(uuid: id, type: .fromBuilder(builder), value: builder.valueBuilder)
-    }
-    
-    public convenience init(_ builder: PropertyBuilderID) {
-        self.init(builder.builder, builder.id)
-    }
 
-    public var type: TypeEnum {
-        .init(self.type_id)
-    }
-    
-    public var builder: PropertyBuilder {
-        switch self.type {
-        case .input(let inputEnum): return .input(.init(inputEnum, self.value_rawValue))
-        case .mode: return .mode(.init(self.value_id))
-        case .system: return .system(.init(self.value_id))
-        case .format: return .format(.init(self.value_id))
-        }
-    }
-        
-    public var rawValue: String {
-        "(\(self.type.rawValue)) \(self.builder.rawValue)"
-    }
-    
-}
 
-@Model
-public final class Platform: ModelProtocol {
-
-    @Relationship(deleteRule: .nullify) var primary: Property?
-    @Relationship(deleteRule: .nullify) var secondary: Property?
-    
-    public private(set) var uuid: UUID
-    public private(set) var games: [Game] = [] // Initialize array to prevent potential bugs
-
-    public required init(_ primary: Property, _ secondary: Property) {
-        self.uuid = .init()
-        self.primary = primary
-        self.secondary = secondary
-    }
-    
-    public var rawValue: String {
-        let primary: String = self.primary?.value_rawValue ?? .defaultValue
-        let secondary: String = self.secondary?.value_rawValue ?? .defaultValue
-        return "\(primary) | \(secondary)"
-    }
-    
-    public var systemBuilder: SystemBuilder? {
-        if let s: String = self.primary?.value_id {
-            return .init(s)
-        } else { return nil }
-    }
-    
-    public var formatBuilder: FormatBuilder? {
-        if let s: String = self.secondary?.value_id {
-            return .init(s)
-        } else { return nil }
-    }
-    
-    public var builder: PlatformBuilder? {
-        if let s: SystemBuilder = self.systemBuilder, let f: FormatBuilder = self.formatBuilder, let b: PlatformBuilder = .init(s, f) {
-            return b
-        } else { return nil }
-    }
-
-}
 
 /*
  @Model
- final class ModelA: ModelProtocol {
+ final class ModelA: OldModelProtocol {
      public private(set) var name: String
      public private(set) var age: Int
      
@@ -272,7 +153,7 @@ public final class Platform: ModelProtocol {
  }
 
  @Model
- final class ModelB: ModelProtocol {
+ final class ModelB: OldModelProtocol {
      
      public enum TypeEnum: Enumerable {
          case v1, v2, v3, v4, v5, vA, vB
@@ -304,7 +185,7 @@ public final class Platform: ModelProtocol {
  }
 
  @Model
- final class ModelC: ModelProtocol {
+ final class ModelC: OldModelProtocol {
 
      @Relationship(deleteRule: .nullify) var primaryB: ModelB?
      @Relationship(deleteRule: .nullify) var secondaryB: ModelB?

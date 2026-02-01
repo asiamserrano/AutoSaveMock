@@ -7,7 +7,15 @@
 
 import Foundation
 
-public struct InputBuilder: Identifiable, Hashable, Equatable, Representable {
+public struct InputBuilder: Identifiable, Comparable, Hashable, Equatable, Representable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if lhs.type == rhs.type {
+            return lhs.rawValue < rhs.rawValue
+        } else {
+            return lhs.type < rhs.type
+        }
+    }
 
     public static var random: Self {
         .init(.random, .random)
