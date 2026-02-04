@@ -8,15 +8,21 @@
 import Foundation
 import SwiftData
 
-public protocol ModelBuilderProtocol: Identifiable, Hashable, Comparable, Equatable, Randomizable, Representable {
+public protocol PersistentProtocol: Representable {
     
-    associatedtype Model: ModelProtocol
+    typealias Persistent = any PersistentModelProtocol
+    
+}
+
+public protocol PersistentModelBuilderProtocol: Identifiable, Hashable, Comparable, Equatable, Randomizable, Representable {
+    
+    associatedtype Model: PersistentModelProtocol
     
     init(model: Model)
     
 }
 
-//extension ModelBuilderProtocol where Model.Builder == Self {
+//extension PersistentModelBuilderProtocol where Model.Builder == Self {
 //    
 //    public var model: Model {
 //        .init(builder: self)
@@ -24,15 +30,34 @@ public protocol ModelBuilderProtocol: Identifiable, Hashable, Comparable, Equata
 //    
 //}
 
-public protocol ModelProtocol: PersistentModel, Representable {
+public protocol PersistentModelProtocol: PersistentModel, PersistentProtocol {
     
-    associatedtype Builder: ModelBuilderProtocol
+    associatedtype Builder: PersistentModelBuilderProtocol
     
     init(builder: Builder)
     
+    var uuid: UUID { get }
+    var composite_key: String { get }
+    
 }
 
-extension ModelProtocol where Builder.Model == Self {
+extension PersistentModelProtocol {
+    
+    public var info: [String] {
+        [
+            self.persistentModelID.entityName,
+            self.persistentModelID.hashValue.description,
+            self.persistentModelID.storeIdentifier
+        ].compactMap(\.self)
+    }
+    
+    public var composite: CompositeKey {
+        .init(model: self)
+    }
+    
+}
+
+extension PersistentModelProtocol where Builder.Model == Self {
     
     public var builder: Builder {
         .init(model: self)
@@ -40,11 +65,42 @@ extension ModelProtocol where Builder.Model == Self {
     
 }
 
-public protocol AttributeModelProtocol: ModelProtocol {
+public protocol AttributeModelProtocol: PersistentModelProtocol {
     
     typealias Games = [Game]
     
     var games: Games { get }
+    
+}
+
+public protocol ModelProtocol: Identifiable, Hashable, Equatable, Comparable, PersistentProtocol {
+            
+    var persistent: Persistent { get }
+    var key: Model.Key { get }
+}
+
+extension ModelProtocol {
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if lhs.key == rhs.key {
+            return lhs.rawValue < rhs.rawValue
+        } else {
+            return lhs.key < rhs.key
+        }
+    }
+    
+    public var id: Int { self.hashValue }
+    
+    public var rawValue: String { self.persistent.rawValue }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.key)
+        hasher.combine(self.rawValue)
+    }
     
 }
 
@@ -67,7 +123,7 @@ public protocol AttributeModelProtocol: ModelProtocol {
 
  }
 
- public enum ModelEnum: Encapsulable {
+ public enum Model.Key: Encapsulable {
      
      case game, property, platform
      
@@ -85,12 +141,12 @@ public protocol AttributeModelProtocol: ModelProtocol {
      
  }
 
- public protocol OldModelBuilderProtocol: Identifiable, Hashable, Equatable, Comparable, Representable {
+ public protocol OldPersistentModelBuilderProtocol: Identifiable, Hashable, Equatable, Comparable, Representable {
      var model: Model { get }
-     var type: ModelEnum { get }
+     var type: Model.Key { get }
  }
 
- extension OldModelBuilderProtocol {
+ extension OldPersistentModelBuilderProtocol {
      
      public static func == (lhs: Self, rhs: Self) -> Bool {
          lhs.hashValue == rhs.hashValue
@@ -115,7 +171,7 @@ public protocol AttributeModelProtocol: ModelProtocol {
      
  }
 
- public enum ModelBuilder: OldModelBuilderProtocol {
+ public enum ModelBuilder: OldPersistentModelBuilderProtocol {
      
      public static func transform(_ arr: [Model]) -> Set<Self> {
          .init(arr.compactMap {
@@ -163,7 +219,7 @@ public protocol AttributeModelProtocol: ModelProtocol {
          }
      }
      
-     public var type: ModelEnum {
+     public var type: Model.Key {
          switch self {
          case .game: return .game
          case .property: return .property

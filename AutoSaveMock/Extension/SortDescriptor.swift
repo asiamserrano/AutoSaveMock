@@ -1,12 +1,12 @@
-////
-////  SortDescriptor.swift
-////  autosave
-////
-////  Created by Asia Michelle Serrano on 5/7/25.
-////
 //
-//import Foundation
+//  SortDescriptor.swift
+//  autosave
 //
+//  Created by Asia Michelle Serrano on 5/7/25.
+//
+
+import Foundation
+
 //public typealias GameSortDescriptor = SortDescriptor<GameModel>
 //
 //public extension GameSortDescriptor {
@@ -26,15 +26,15 @@
 ////    }
 //    
 //}
-//
-//public typealias PropertySortDescriptor = SortDescriptor<PropertyModel>
-//
-//public extension PropertySortDescriptor {
-//    
-//    static var category: Self {
-//        .init(\.category_id, order: .forward)
-//    }
-//    
+
+public typealias PropertySortDescriptor = SortDescriptor<Property>
+
+public extension PropertySortDescriptor {
+    
+    static var keyBuilder: Self {
+        .init(\.key_builder_id, order: .forward)
+    }
+    
 //    static var type: Self {
 //        .init(\.type_id, order: .forward)
 //    }
@@ -43,8 +43,8 @@
 //        .init(\.label_id, order: .forward)
 //    }
 //    
-//    static var value: Self {
-//        .init(\.value_canon, order: .forward)
-//    }
-//    
-//}
+    static var value: Self {
+        .init(\.value_id, order: .forward)
+    }
+    
+}

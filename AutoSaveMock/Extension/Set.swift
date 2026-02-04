@@ -7,14 +7,6 @@
 
 import Foundation
 
-extension Array where Element:Collection, Element.Element: Hashable {
-    
-    public var flatten: Set<Element.Element> {
-        Set(self.flatMap(\.self))
-    }
-    
-}
-
 extension Set {
     
     public init(_ elements: Element...) {
@@ -45,10 +37,6 @@ extension Set {
         return new
     }
     
-    public func lacks(_ element: Element) -> Bool {
-        !self.contains(element)
-    }
-    
 }
 
 extension Set: Defaultable {
@@ -56,3 +44,35 @@ extension Set: Defaultable {
     public static var defaultValue: Self { .init() }
     
 }
+
+extension Set where Element: Randomizable {
+        
+    public init(_ size: Int) {
+        self = .init()
+        while self.count < size { self.insert(.random) }
+    }
+    
+}
+
+extension Set where Element == Attribute.Builder {
+    
+    
+    public var propertyBuilderSet: PropertyBuilderSet {
+        self.map(\.properties).flatten
+    }
+    
+}
+
+/*
+ extension Set {
+     
+
+     
+  
+     
+     public func lacks(_ element: Element) -> Bool {
+         !self.contains(element)
+     }
+     
+ }
+ */

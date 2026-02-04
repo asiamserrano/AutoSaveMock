@@ -19,9 +19,11 @@ public protocol Representable {
     var rawValue: String { get }
 }
 
-public protocol Uuidable {
-    var uuid: UUID { get }
-}
+//public protocol Uuidable {
+//    var uuid: UUID { get }
+//}
+
+
 
 public protocol Protocolable: Identifiable, Equatable, Hashable {}
 

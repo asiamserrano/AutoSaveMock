@@ -1,19 +1,44 @@
-////
-////  FetchDescriptor.swift
-////  autosave
-////
-////  Created by Asia Michelle Serrano on 5/7/25.
-////
 //
-//import Foundation
-//import SwiftData
+//  FetchDescriptor.swift
+//  autosave
 //
+//  Created by Asia Michelle Serrano on 5/7/25.
+//
+
+import Foundation
+import SwiftData
+
+
+
+public extension FetchDescriptor {
+    
+    static var defaultValue: Self { .init() }
+    
+}
+
+extension FetchDescriptor where T: PersistentModelProtocol {
+        
+    public static func getByUUID(model: Model.Key, _ uuid: UUID) -> Self {
+        .init(predicate: .getByUUID(model: model, uuid))
+    }
+    
+    public static func getByCompositeKey(model: Model.Key,_ composite: CompositeKey) -> Self {
+        .init(predicate: .getByCompositeKey(model: model, composite))
+    }
+    
+}
+
+//
+//// CODEx CHANGE START: Replaced generic byCompositeKey/byUUID helpers with a generic predicate wrapper that compiles for all model types.
 //public extension FetchDescriptor {
 //    
-//    static var defaultValue: Self { .init() }
+//    static func withPredicate(_ predicate: Predicate<T>, sortBy: [SortDescriptor<T>] = .init()) -> Self {
+//        .init(predicate: predicate, sortBy: sortBy)
+//    }
 //    
 //}
-//
+// CODEx CHANGE END
+
 //public typealias GameFetchDescriptor = FetchDescriptor<GameModel>
 //
 //public extension GameFetchDescriptor {
@@ -49,20 +74,27 @@
 ////    }
 //    
 //}
+
+//public typealias PropertyFetchDescriptor = FetchDescriptor<Property>
 //
-//public typealias PropertyFetchDescriptor = FetchDescriptor<PropertyModel>
-//
-//public extension PropertyFetchDescriptor {
+//extension PropertyFetchDescriptor {
 //    
-//    static func getByCompositeKey(_ snapshot: PropertySnapshot) -> Self {
-//        let type_id: String = snapshot.type_id
-//        let category_id: String = snapshot.category_id
-//        let label_id: String = snapshot.label_id
-//        let value_canon: String = snapshot.value_canon
-//        let predicate: PropertyPredicate = .getByCompositeKey(type_id, category_id, label_id, value_canon)
-//        return .init(predicate: predicate, sortBy: .defaultValue)
+//    private static func predicate(_ predicate: PropertyPredicate) -> Self {
+//        .withPredicate(predicate, sortBy: [.keyBuilder, .value])
 //    }
-////    
+//    
+//    public static func getByCompositeKey(_ composite: CompositeKey) -> Self {
+//        .withPredicate(.getByCompositeKey(composite), sortBy: [.keyBuilder, .value])
+//    }
+//    
+//    static func getByKey(_ key: Property.Key) -> Self {
+//        .predicate(.getByKey(key))
+//    }
+//    
+//    static func getByKeyBuilder(_ keyBuilder: Property.Key.Builder) -> Self {
+//        .predicate(.getByKeyBuilder(keyBuilder))
+//    }
+//    
 ////    static func getByUUID(_ snapshot: PropertySnapshot) -> Self {
 ////        let uuid: UUID = snapshot.uuid
 ////        let predicate: PropertyPredicate = .getByUUID(uuid)
@@ -76,7 +108,7 @@
 ////    }
 //    
 //}
-//
+
 //public typealias RelationFetchDescriptor = FetchDescriptor<RelationModel>
 //
 //public extension RelationFetchDescriptor {

@@ -150,47 +150,13 @@
 //}
 //
 //
-//public struct PropertyBuilderID: Identifiable, Equatable, Hashable, Comparable, Representable {
-//        
-//    public static func < (lhs: Self, rhs: Self) -> Bool {
-//        lhs.builder < rhs.builder
-//    }
-//    
-//    public static func == (lhs: Self, rhs: Self) -> Bool {
-//        lhs.hashValue == rhs.hashValue
-//    }
-//    
-//    public let id: UUID
-//    public let builder: PropertyBuilder
-//    
-//    public func hash(into hasher: inout Hasher) {
-//        hasher.combine(self.builder)
-//    }
-//    
-//    public init(_ builder: PropertyBuilder) {
-//        self.id = .init()
-//        self.builder = builder
-//    }
-//    
-//    public var property: PropertyEnum { self.builder.property }
-//    public var rawValue: String { self.builder.rawValue }
-//    
-//    public var enumeror: Enumeror {
-//        switch self.builder {
-//        case .input(let i): return i.type.toEnumeror
-//        default: return self.property.toEnumeror
-//        }
-//    }
-//    
-//}
-//
-//public typealias PropertyBuilderIDSet = Set<PropertyBuilderID>
-//public typealias AttributeBuilderDict = [AttributeBuilder: PropertyBuilderIDSet]
-//public typealias AttributeEnumDict = [AttributeEnum: AttributeBuilderDict]
-//public typealias PropertyBuilderIDDict = [PropertyBuilderID: AttributeBuilderSet]
-//public typealias PropertyEnumDict = [PropertyEnum: PropertyBuilderIDDict]
-//public typealias GameBuilderSet = Set<Game.Builder>
-//public typealias GameBuilderDict = [Game.Builder: AttributeBuilderSet]
+////public typealias PropertyBuilderIDSet = Set<PropertyBuilderID>
+////public typealias AttributeBuilderDict = [AttributeBuilder: PropertyBuilderIDSet]
+////public typealias AttributeEnumDict = [AttributeEnum: AttributeBuilderDict]
+////public typealias PropertyBuilderIDDict = [PropertyBuilderID: AttributeBuilderSet]
+////public typealias PropertyEnumDict = [PropertyEnum: PropertyBuilderIDDict]
+////public typealias GameBuilderSet = Set<Game.Builder>
+////public typealias GameBuilderDict = [Game.Builder: AttributeBuilderSet]
 //
 //#Preview {
 //    

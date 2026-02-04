@@ -8,22 +8,15 @@
 import Foundation
 import SwiftUI
 
-//public enum FeatureEnum: Enumerable {
-//    case input, mode, system, format, platform
-//}
+public typealias PropertyArray = [Property]
+public typealias AttributeBuilderSet = Set<Attribute.Builder>
+public typealias PropertyBuilderSet = Set<Property.Builder>
+public typealias AttributeDict = [Attribute.Key: AttributeBuilderSet]
+public typealias PlatformArray = [Platform]
+public typealias PlatformBuilderSet = Set<Platform.Builder>
+public typealias GameBuilderSet = Set<Game.Builder>
 
-//public enum PropertyEnum: Enumerable {
-//
-//    case input, mode, system, format
-//
-//    public var title: String? {
-//        switch self {
-//        case .input: return nil
-//        default: return self.rawValue.pluralize()
-//        }
-//    }
-//
-//}
+
 
 // MARK: - These are for PropertiesView
 //public enum Level1: Encapsulable {
@@ -100,37 +93,37 @@ import SwiftUI
 //    }
 //    
 //}
-
-public enum Level3: Identifiable, Hashable, Representable {
-    
-    case input(InputBuilder)
-    case mode(ModeEnum)
-    case system(SystemBuilder)
-    case format(FormatBuilder)
-    
-    public var id: String {
-        switch self {
-        case .input(let inputBuilder): return inputBuilder.id.uuidString
-        case .mode(let mode): return mode.id
-        case .system(let systemBuilder): return systemBuilder.id
-        case .format(let formatBuilder): return formatBuilder.id
-        }
-    }
-    
-    public var rawValue: String {
-        switch self {
-        case .input(let inputBuilder): return inputBuilder.rawValue
-        case .mode(let mode): return mode.rawValue
-        case .system(let systemBuilder): return systemBuilder.rawValue
-        case .format(let formatBuilder): return formatBuilder.rawValue
-        }
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-    }
-    
-}
+//
+//public enum Level3: Identifiable, Hashable, Representable {
+//    
+//    case input(InputBuilder)
+//    case mode(ModeEnum)
+//    case system(SystemBuilder)
+//    case format(FormatBuilder)
+//    
+//    public var id: String {
+//        switch self {
+//        case .input(let inputBuilder): return inputBuilder.id.uuidString
+//        case .mode(let mode): return mode.id
+//        case .system(let systemBuilder): return systemBuilder.id
+//        case .format(let formatBuilder): return formatBuilder.id
+//        }
+//    }
+//    
+//    public var rawValue: String {
+//        switch self {
+//        case .input(let inputBuilder): return inputBuilder.rawValue
+//        case .mode(let mode): return mode.rawValue
+//        case .system(let systemBuilder): return systemBuilder.rawValue
+//        case .format(let formatBuilder): return formatBuilder.rawValue
+//        }
+//    }
+//    
+//    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(self.id)
+//    }
+//    
+//}
 
 // MARK: - These are for ModelClassLoader
 
@@ -145,162 +138,7 @@ public enum Level3: Identifiable, Hashable, Representable {
  case input(InputBuilder), mode(ModeEnum), platform(PlatformBuilder)
  */
 
-public struct Attribute: Identifiable, Hashable, Comparable {
-    
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.builder < rhs.builder
-    }
-    
-    public enum Key: Enumerable {
-        case input, mode, platform
-        
-        public enum Builder: Encapsulable {
-            
-            public static var allCases: Cases { Key.cases.flatMap(\.builderCases) }
-            
-            case input(InputEnum)
-            case mode, platform
-            
-            public var enumeror: Enumeror {
-                switch self {
-                case .input(let i): return i.toEnumeror
-                default: return self.key.toEnumeror
-                }
-            }
-            
-            public var key: Key {
-                switch self {
-                case .input: return .input
-                case .mode: return .mode
-                case .platform: return .platform
-                }
-            }
-            
-        }
-        
-        public var builderCases: Builder.Cases {
-            switch self {
-            case .input: return InputEnum.cases.map { Builder.input($0) }
-            case .mode: return .init(.mode)
-            case .platform: return .init(.platform)
-            }
-        }
 
-    }
-
-    public enum Builder: Identifiable, Hashable, Comparable {
-                    
-        public static func < (lhs: Self, rhs: Self) -> Bool {
-            if let l: Property.Builder = lhs.secondary, let r: Property.Builder = rhs.secondary {
-                if lhs.primary == rhs.primary {
-                    return l < r
-                }
-            }
-            return lhs.primary < rhs.primary
-        }
-        
-//        public static func random(_ key: Key.Builder, _ size: Int) -> AttributeBuilderSet {
-//            switch key {
-//            case .input(let i):
-//                var array: Set<InputBuilder> = .init()
-//                while array.count < size {
-//                    array.insert(.init(i, .random))
-//                }
-//                return array.map { Self.input($0) }.toSet
-//            case .mode:
-//                return ModeEnum.cases.shuffled().prefix(min(size, ModeEnum.cases.count)).map { Self.mode($0) }.toSet
-//            default:
-//                return PlatformBuilder.cases.shuffled().prefix(min(size, PlatformBuilder.cases.count)).map { Self.platform($0) }.toSet
-//            }
-//        }
-        
-        case input(InputBuilder)
-        case mode(ModeEnum)
-        case platform(Platform.Builder)
-        
-        public var id: Int { self.hashValue }
-        
-        public var keyBuilder: Key.Builder {
-            switch self {
-            case .input(let i): return .input(i.type)
-            case .mode: return .mode
-            case .platform: return .platform
-            }
-        }
-        
-        public var primary: Property.Builder {
-            switch self {
-            case .input(let i): return .input(i)
-            case .mode(let m): return .mode(m)
-            case .platform(let p): return .system(p.system)
-            }
-        }
-
-        public var secondary: Property.Builder? {
-            switch self {
-            case .platform(let p): return .format(p.format)
-            default: return nil
-            }
-        }
-        
-        public var rawValue: String {
-            if let s: Property.Builder = self.secondary {
-                return "\(self.primary.rawValue) | \(s.rawValue)"
-            } else {
-                return "(\(self.keyBuilder.rawValue)) \(self.primary.rawValue)"
-            }
-        }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(self.keyBuilder)
-            hasher.combine(self.primary)
-            hasher.combine(self.secondary)
-        }
-        
-        public var uuid: UUID? {
-            switch self {
-            case .platform(let p): return p.wrapper?.uuid
-            default: return nil
-            }
-        }
-
-    }
-    
-    public enum Model {
-        case property(Property)
-        case platform(Platform)
-    }
-    
-    public let uuid: UUID
-    public let builder: Builder
-    
-    public init(_ builder: Builder) {
-        self.uuid = builder.uuid ?? .init()
-        self.builder = builder
-    }
-    
-    public var primary: Property.Builder { self.builder.primary }
-    
-    public var properties: Set<Property.Builder> {
-        var set: Set<Property.Builder> = .init(self.primary)
-        if let s: Property.Builder = self.builder.secondary { set.insert(s) }
-        return set
-    }
-    
-    public func createModel() -> Model {
-        switch self.builder {
-        case .platform(let p): return .platform(.init(builder: p))
-        default: return .property(.init(uuid: uuid, builder: self.primary))
-        }
-    }
-    
-    public var id: Int { self.hashValue }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.builder)
-    }
-    
-}
 
 
 //public enum AttributeEnum: Enumerable {

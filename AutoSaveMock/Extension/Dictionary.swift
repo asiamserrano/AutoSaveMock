@@ -15,12 +15,12 @@ extension Dictionary where Key: Comparable {
     
 }
 
-//extension Dictionary: Defaultable {
-//    
-//    public static var defaultValue: Self { .init() }
-//    
-//}
-//
+extension Dictionary: Defaultable {
+    
+    public static var defaultValue: Self { .init() }
+    
+}
+
 //extension Dictionary: Quantifiable {
 //    
 //    public var quantity: Int { self.count }

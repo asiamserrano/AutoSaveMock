@@ -9,9 +9,9 @@ import Foundation
 import SwiftData
 
 @Model
-public final class Game: ModelProtocol {
+public final class Game: PersistentModelProtocol {
     
-    public struct Builder: ModelBuilderProtocol {
+    public struct Builder: PersistentModelBuilderProtocol {
         
         public typealias Model = Game
         
@@ -33,6 +33,8 @@ public final class Game: ModelProtocol {
         public let status: Bool
         public let boxart: Data?
         public let added: Date
+        
+        // public private(set) var attributes: AttributeBuilderSet
                 
         private init(_ u: UUID, _ t: String, _ r: Date, _ s: Bool, _ b: Data?, _ a: Date) {
             self.id = u
@@ -68,6 +70,7 @@ public final class Game: ModelProtocol {
     }
     
     public private(set) var uuid: UUID
+    public private(set) var composite_key: String
     public private(set) var added: Date
     public private(set) var title_id: String
     public private(set) var title_rawValue: String
@@ -75,14 +78,29 @@ public final class Game: ModelProtocol {
     public private(set) var status_bool: Bool
     public private(set) var boxart_data: Data?
     
-    private init(uuid: UUID, title: String, release: Date, status: Bool = true, boxart: Data? = nil, added: Date = .now) {
+    private init(uuid: UUID, title: CompositeKey, composite: CompositeKey, status: Bool, boxart: Data?, added: Date) {
         self.uuid = uuid
         self.added = added
-        self.title_id = title.canonicalized
-        self.title_rawValue = title.trimmed
-        self.release_date = release.dashless
+        self.title_id = title.first
+        self.title_rawValue = title.last
+        self.release_date = composite.last
         self.status_bool = status
         self.boxart_data = boxart
+        self.composite_key = composite.rawValue
+    }
+    
+    private init(uuid: UUID, title: String, release: Date, status: Bool = true, boxart: Data? = nil, added: Date = .now) {
+        let title: CompositeKey = .init(string: title)
+        let composite: CompositeKey = title.recompose(replace: .last, release.dashless)
+    
+        self.uuid = uuid
+        self.added = added
+        self.title_id = title.first
+        self.title_rawValue = title.last
+        self.release_date = composite.last
+        self.status_bool = status
+        self.boxart_data = boxart
+        self.composite_key = composite.rawValue
     }
     
     private convenience init(uuid: UUID) {
@@ -90,7 +108,8 @@ public final class Game: ModelProtocol {
     }
     
     public convenience init(builder: Builder) {
-        self.init(uuid: builder.id, title: builder.title, release: builder.release, status: builder.status, boxart: builder.boxart, added: builder.added)
+        self.init(uuid: builder.id, title: builder.title, release: builder.release,
+                  status: builder.status, boxart: builder.boxart, added: builder.added)
     }
         
     @Relationship(inverse: \Property.games)
@@ -107,22 +126,20 @@ public final class Game: ModelProtocol {
     public var rawValue: String {
         self.builder.rawValue
     }
-    
-    public var propertiesCount: Int { self.properties.count }
-    public var platformsCount: Int { self.platforms.count }
-    public var totalCount: Int { self.propertiesCount + self.platformsCount }
-    
-    public var isNotFilled: Bool {
-        self.propertiesCount == 0 || self.platformsCount < 2 || self.totalCount < 6
+
+    public func insert(_ model: Model.Attribute?) -> Void {
+        if let model = model {
+            switch model {
+            case .property(let property): self.properties.append(property)
+            case .platform(let platform): self.platforms.append(platform)
+            }
+        }
     }
     
-//    public func insert(_ model: any ModelProtocol) -> Void {
-//        if let property: Property = model.property {
-//            self.properties.append(property)
-//        } else if let platform: Platform = model.platform {
-//            self.platforms.append(platform)
-//        }
-//    }
+    public var attributes: AttributeBuilderSet {
+        self.properties.compactMap(\.builder.attributeBuilder).toSet +
+        self.platforms.compactMap(\.builder.attributeBuilder).toSet
+    }
     
 }
 

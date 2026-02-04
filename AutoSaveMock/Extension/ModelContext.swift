@@ -10,17 +10,53 @@ import SwiftData
 
 extension ModelContext {
     
-    public func _insert(_ model: any PersistentModel) {
-        self.insert(model)
+    public func insert(model: Model) {
+        self.insert(model.persistent)
         self._save()
     }
     
-    public func _delete(_ model: any PersistentModel) {
-        self.delete(model)
-        self._save()
+    public func delete(model: Model) {
+        switch model {
+        case .game(let game):
+            let properties = game.properties
+            let platforms = game.platforms
+            self.remove(game)
+            self.remove(properties)
+            self.remove(platforms)
+        case .attribute(let attribute):
+            switch attribute {
+            case .property(let property):
+                // TODO: if a property is deleted that is part of a platform and the sister property is now orphaned, that sister needs to be deleted too
+                let platforms = property.platforms
+                self.remove(property)
+                self.remove(platforms)
+            case .platform(let platform):
+                self.remove(platform)
+            }
+        }
+    }
+
+    public func fetch(_ key: Property.Key) -> PropertyArray? {
+        self.fetch(all: Property.getByKey(key))
     }
     
-    private func _save() {
+    public func fetch(_ keyBuilder: Property.Key.Builder) -> PropertyArray? {
+        self.fetch(all: Property.getByKeyBuilder(keyBuilder))
+    }
+    
+    public func fetchByUUID<T: PersistentModelProtocol>(model: Model.Key, _ uuid: UUID) -> T? {
+        self.fetch(first: .getByUUID(model: model, uuid))
+    }
+    
+    public func fetchByCompositeKey<T: PersistentModelProtocol>(model: Model.Key, _ composite: CompositeKey) -> T? {
+        self.fetch(first: .getByCompositeKey(model: model, composite))
+    }
+    
+}
+
+private extension ModelContext {
+    
+    func _save() {
         do {
             try self.save()
         } catch let error {
@@ -28,12 +64,43 @@ extension ModelContext {
         }
     }
     
+    func fetch<T: PersistentModelProtocol>(all: FetchDescriptor<T>) -> [T]? {
+        ((try? self.fetch(all)) ?? .defaultValue).optional
+    }
+    
+    func fetch<T: PersistentModelProtocol>(first: FetchDescriptor<T>) -> T? {
+        self.fetch(all: first)?.first
+    }
+    
+    func remove(_ persistent: Model.Persistent) {
+        self.delete(persistent)
+        self._save()
+    }
+    
+    func remove(_ properties: [Property]) {
+        properties.forEach { property in
+            if property.games.isEmpty {
+                self.delete(property)
+            }
+        }
+        self._save()
+    }
+    
+    func remove(_ platforms: [Platform]) {
+        platforms.forEach { platform in
+            if platform.games.isEmpty || platform.properties.count < 2 {
+                self.delete(platform)
+            }
+        }
+        self._save()
+    }
+    
 }
 
 //
 //extension ModelContext {
 //    
-//    public func fetchCount(_ model: ModelEnum) -> Int {
+//    public func fetchCount(_ model: Model.Key) -> Int {
 //        switch model {
 //        case .game:
 //            let desc: GameFetchDescriptor = .init(predicate: .true)

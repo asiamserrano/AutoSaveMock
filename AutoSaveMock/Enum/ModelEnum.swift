@@ -1,14 +1,14 @@
+////
+////  Model.Key.swift
+////  autosave
+////
+////  Created by Asia Serrano on 7/3/25.
+////
 //
-//  ModelEnum.swift
-//  autosave
+//import Foundation
 //
-//  Created by Asia Serrano on 7/3/25.
-//
-
-import Foundation
-
-public enum ModelEnum: Enumerable {
-    case game
-    case property
-    case platform
-}
+//public enum Model.Key: Enumerable {
+//    case game
+//    case property
+//    case platform
+//}

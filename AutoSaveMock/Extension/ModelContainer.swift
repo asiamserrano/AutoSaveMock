@@ -23,6 +23,17 @@ extension ModelContainer {
         }
     }
     
-    public static let preview: ModelContainer = .init(memory: true)
+    public static func loaded(_ aSize: Int, _ size: Int) -> ModelContainer {
+        ModelContainerLoader.load(aSize, size, .preview)
+    }
+    
+    public static var preview: ModelContainer {
+        let container: ModelContainer = .init(memory: true)
+
+        container.mainContext.autosaveEnabled = false
+        container.mainContext.undoManager = .init()
+        
+        return container
+    }
  
 }

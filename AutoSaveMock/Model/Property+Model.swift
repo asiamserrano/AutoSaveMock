@@ -11,29 +11,6 @@ import SwiftData
 @Model
 public final class Property: AttributeModelProtocol {
     
-    // what needs a switch vs what needs to iterate
-    
-    /*
-     
-     Attribute = Property OR Platform
-     
-     // cases of property key types
-     case input, mode, system, format
-     
-     // cases of property keys
-     case input(InputEnum), mode, system(SystemEnum), format(FormatEnum)
-     
-     // cases of property builders
-     case input(InputBuilder), mode(ModeEnum), system(SystemBuilder), format(FormatBuilder)
-     
-     // cases of property and platform key types
-     case input, mode, platform
-     
-     // cases of property and platform builders
-     case input(InputBuilder), mode(ModeEnum), platform(PlatformBuilder)
-     
-     */
-    
     public enum Key: Enumerable {
         case input, mode, system, format
         
@@ -86,53 +63,11 @@ public final class Property: AttributeModelProtocol {
             }
         }
         
-//        public var level3Cases: [Level3] {
-//            switch self {
-//            case .input(let inputEnum):
-//                var arr: [Level3] = .init()
-//                while arr.count < 5 {
-//                    let str: String = "\(inputEnum.description) " + .random
-//                    arr.append(.input(InputBuilder(inputEnum, str)))
-//                }
-//                return arr
-//            case .system(let systemEnum): return systemEnum.builders.map(Level3.system)
-//            case .format(let formatEnum): return formatEnum.builders.map(Level3.format)
-//            }
-//        }
-        
     }
     
-    public enum Builder: ModelBuilderProtocol {
+    public enum Builder: PersistentModelBuilderProtocol {
         
         public typealias Model = Property
-        
-//        public struct Identity: Identifiable, Equatable, Hashable, Comparable, Representable {
-//                
-//            public static func < (lhs: Self, rhs: Self) -> Bool {
-//                lhs.builder < rhs.builder
-//            }
-//            
-//            public static func == (lhs: Self, rhs: Self) -> Bool {
-//                lhs.hashValue == rhs.hashValue
-//            }
-//            
-//            public let id: UUID
-//            public let builder: Builder
-//            
-//            public func hash(into hasher: inout Hasher) {
-//                hasher.combine(self.builder)
-//            }
-//            
-//            public init(_ builder: Builder, _ uuid: UUID = .init()) {
-//                self.id = uuid
-//                self.builder = builder
-//            }
-//            
-//            public var key: Key { self.builder.key }
-//            public var keyBuilder: Key.Builder { self.builder.keyBuilder }
-//            public var rawValue: String { self.builder.rawValue }
-//            
-//        }
                 
         public static func < (lhs: Self, rhs: Self) -> Bool {
             if lhs.key == rhs.key {
@@ -159,7 +94,7 @@ public final class Property: AttributeModelProtocol {
         case format(FormatBuilder)
         
         public init(model: Model) {
-            switch model.keyBuilder {
+            switch Key.Builder(model.key_builder_id) {
             case .input(let inputEnum): self = .input(.init(inputEnum, model.value_rawValue))
             case .mode: self = .mode(.init(model.value_id))
             case .system: self = .system(.init(model.value_id))
@@ -194,35 +129,33 @@ public final class Property: AttributeModelProtocol {
             case .format(let f): return .format(f.format)
             }
         }
-                
-//        public var systemBuilder: SystemBuilder? {
-//            switch self {
-//            case .system(let s): return s
-//            default: return nil
-//            }
-//        }
-//        
-//        public var formatBuilder: FormatBuilder? {
-//            switch self {
-//            case .format(let f): return f
-//            default: return nil
-//            }
-//        }
+        
+        public var attributeBuilder: Attribute.Builder? {
+            switch self {
+            case .input(let i): return .input(i)
+            case .mode(let m): return .mode(m)
+            default: return nil
+            }
+        }
 
     }
     
     public private(set) var uuid: UUID
+    public private(set) var composite_key: String
     public private(set) var key_builder_id: String
     public private(set) var value_id: String
     public private(set) var value_rawValue:  String
     
     public private(set) var games: Games = []
+    public private(set) var platforms: [Platform] = []
 
     private init(uuid: UUID, keyBuilder: Key.Builder, value: ValueBuilder) {
+        let composite: CompositeKey = .init(first: keyBuilder.id, last: value.id)
         self.uuid = uuid
-        self.key_builder_id = keyBuilder.id
-        self.value_id = value.id
+        self.key_builder_id = composite.first
+        self.value_id = composite.last
         self.value_rawValue = value.rawValue
+        self.composite_key = composite.rawValue
     }
     
     public convenience init(uuid: UUID, builder: Builder) {
@@ -233,15 +166,11 @@ public final class Property: AttributeModelProtocol {
         self.init(uuid: .init(), builder: builder)
     }
     
-//    public convenience init(builder: Builder) {
-//        self.init(builder, .init())
-//    }
-//    
-//    public convenience init(identity: Builder.Identity) {
-//        self.init(identity.builder, identity.id)
-//    }
-
-    public var keyBuilder: Key.Builder { .init(self.key_builder_id) }
+    public var key: Key { self.builder.key }
+    
+    public var keyBuilder: Key.Builder { self.builder.keyBuilder }
+    
+    public var valueBuilder: ValueBuilder { self.builder.valueBuilder }
         
     public var rawValue: String {
         "(\(self.keyBuilder.rawValue)) \(self.builder.rawValue)"
@@ -253,5 +182,24 @@ public final class Property: AttributeModelProtocol {
 extension Property {
     
     public static var random: Property { .init(builder: .random) }
+    
+    public static func getByKeyBuilder(_ keyBuilder: Property.Key.Builder) -> FetchDescriptor<Property> {
+        let id: String = keyBuilder.id
+        return .init(predicate: #Predicate {
+            $0.key_builder_id == id
+        })
+    }
+    
+    public static func getByKey(_ key: Property.Key) -> FetchDescriptor<Property> {
+        let ids: [String] = key.builderCases.map(\.id)
+        return .init(predicate: #Predicate {
+            ids.contains($0.key_builder_id)
+        })
+    }
+    
+    public static func getByUUID(_ uuid: UUID) -> FetchDescriptor<Property> {
+        let id = uuid
+        return .init(predicate: #Predicate<Property> { $0.uuid == id })
+    }
     
 }

@@ -12,7 +12,7 @@
 //public enum MenuEnum: Encapsulable {
 //    
 //    public static var allCases: Cases {
-//        ModelEnum.cases.flatMap { type in
+//        Model.Key.cases.flatMap { type in
 //            switch type {
 //            case .game:
 //                return GameStatusEnum.cases.map(Self.game)

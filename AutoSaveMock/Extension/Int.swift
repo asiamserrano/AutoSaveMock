@@ -15,4 +15,6 @@ public extension Int {
         return String(format: "%02d", self)
     }
     
+    var range: [Self] { Array(0..<self) }
+    
 }

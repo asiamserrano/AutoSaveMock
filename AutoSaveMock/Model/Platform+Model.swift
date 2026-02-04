@@ -10,48 +10,8 @@ import SwiftData
 
 @Model
 public final class Platform: AttributeModelProtocol {
-        
-    public enum Wrapper {
-        
-        case properties(Property, Property)  // created from freshly created properties (platform did not exists)
-        case platform(Platform) // loaded from existing platform
-        
-        public var uuid: UUID? {
-            switch self {
-            case .properties: return nil
-            case .platform(let p): return p.uuid
-            }
-        }
-        
-        public var system: Property? {
-            switch self {
-            case .properties(let s, _): return s
-            case .platform(let p): return p.primary
-            }
-        }
-        
-        public var systemBuilder: SystemBuilder? {
-            if let s: Property = self.system {
-                return .init(s.value_id)
-            } else { return nil }
-        }
-        
-        public var format: Property? {
-            switch self {
-            case .properties(_, let f): return f
-            case .platform(let p): return p.secondary
-            }
-        }
-        
-        public var formatBuilder: FormatBuilder? {
-            if let s: Property = self.format {
-                return .init(s.value_id)
-            } else { return nil }
-        }
-                
-    }
     
-    public struct Builder: ModelBuilderProtocol, Iterable {
+    public struct Builder: PersistentModelBuilderProtocol, Iterable {
         
         public typealias Model = Platform
         
@@ -63,69 +23,104 @@ public final class Platform: AttributeModelProtocol {
             lhs.hashValue == rhs.hashValue
         }
         
-        // created from property builders directly
         let system: SystemBuilder
         let format: FormatBuilder
-        let wrapper: Wrapper?
-        
-        public init(system: SystemBuilder, format: FormatBuilder, wrapper: Wrapper? = nil) {
+
+        public init(system: SystemBuilder, format: FormatBuilder) {
             if system.formatBuilders.contains(format) {
                 self.system = system
                 self.format = format
-                self.wrapper = wrapper
             } else {
                 fatalError("Unable to cast system '\(system.rawValue)' and format '\(format.rawValue)' to platform builder")
             }
         }
-        
-        public init(wrapper: Wrapper) {
-            if let s: SystemBuilder = wrapper.systemBuilder, let f: FormatBuilder = wrapper.formatBuilder {
-                self = .init(system: s, format: f, wrapper: wrapper)
-            } else {
-                fatalError("Unable to cast platform model to builder")
-            }
-        }
-        
+
         public init(model: Model) {
-            self.init(wrapper: .platform(model))
+            if let s = model.systemBuilder, let f = model.formatBuilder {
+                self = .init(system: s, format: f)
+            } else {
+                fatalError("Unable to cast model to platform builder")
+            }
         }
         
         public var rawValue: String {
             "\(self.system.rawValue) | \(self.format.rawValue)"
         }
         
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.system)
+            hasher.combine(self.format)
+        }
+        
+        public var attributeBuilder: Attribute.Builder { .platform(self) }
+        
     }
 
-    @Relationship(deleteRule: .nullify) var primary: Property?
-    @Relationship(deleteRule: .nullify) var secondary: Property?
-    
-    public private(set) var uuid: UUID
+    @Relationship(inverse: \Property.platforms)
+    public var properties: [Property] = [] // Initialize array to prevent potential bugs
     public private(set) var games: Games = []
+    public private(set) var uuid: UUID
+    public private(set) var composite_key: String
     
     public required init(_ primary: Property?, _ secondary: Property?, _ uuid: UUID? = nil) {
         self.uuid = uuid ?? .init()
-        self.primary = primary
-        self.secondary = secondary
-    }
-    
-    public convenience init(wrapper: Wrapper?) {
-        if let wrapper: Wrapper = wrapper {
-            self.init(wrapper.system, wrapper.format, wrapper.uuid)
-        } else { self.init(nil, nil) }
+        if let p = primary, let s = secondary {
+            self.properties = .init(p, s)
+            self.composite_key = CompositeKey(first: p.uuid.uuidString, last: s.uuid.uuidString).rawValue
+        } else {
+            self.properties = .defaultValue
+            self.composite_key = .defaultValue
+        }
     }
 
+    public convenience init(builder: Builder, map: [Property.Builder: Property]) {
+        if let primary = map[.system(builder.system)], let secondary = map[.format(builder.format)] {
+            self.init(primary, secondary)
+        } else {
+            self.init(nil, nil)
+        }
+    }
+    
     public convenience init(builder: Builder) {
-        self.init(wrapper: builder.wrapper)
+        self.init(builder: builder, map: .defaultValue)
     }
 
     public var rawValue: String {
-        let primary: String = self.primary?.value_rawValue ?? .defaultValue
-        let secondary: String = self.secondary?.value_rawValue ?? .defaultValue
-        return "\(primary) | \(secondary)"
+        let s: String = self.system?.value_rawValue ?? .defaultValue
+        let f: String = self.format?.value_rawValue ?? .defaultValue
+        return "\(s) | \(f)"
     }
     
-    public var wrapper: Wrapper { .platform(self) }
-    public var systemBuilder: SystemBuilder? { self.wrapper.systemBuilder }
-    public var formatBuilder: FormatBuilder? { self.wrapper.formatBuilder }
+    public var system: Property? {
+        self.properties.first(where: { $0.key == .system })
+    }
+    
+    public var systemBuilder: SystemBuilder? {
+        if let system = system {
+            switch system.builder {
+            case .system(let s): return s
+            default: return nil
+            }
+        } else { return nil }
+    }
+    
+    public var format: Property? {
+        self.properties.first(where: { $0.key == .format })
+    }
+    
+    public var formatBuilder: FormatBuilder? {
+        if let format = format {
+            switch format.builder {
+            case .format(let f): return f
+            default: return nil
+            }
+        } else { return nil }
+    }
+    
+    public var builder: Builder? {
+        if let s = self.systemBuilder, let f = self.formatBuilder {
+            return .init(system: s, format: f)
+        } else { return nil }
+    }
 
 }
