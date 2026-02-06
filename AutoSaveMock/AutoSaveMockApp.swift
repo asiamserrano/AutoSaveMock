@@ -25,7 +25,7 @@ struct AutoSaveMockApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            EmptyView()
         }
         .modelContainer(sharedModelContainer)
     }

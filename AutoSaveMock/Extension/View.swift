@@ -74,12 +74,11 @@ extension View {
 //    }
     
 //    public var appScreenWidth: CGFloat {
-////        UIScreen.sc
 //        UIScreen.main.bounds.width
 //    }
     
-//    public func boolean_action(_ bool: Bool, TRUE: @escaping () -> Void, FALSE: @escaping () -> Void) -> Void {
-//        bool ? TRUE() : FALSE()
-//    }
+    public func boolean_action(_ bool: Bool, TRUE: @escaping () -> Void, FALSE: @escaping () -> Void) -> Void {
+        bool ? TRUE() : FALSE()
+    }
 
 }

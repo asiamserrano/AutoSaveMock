@@ -69,13 +69,13 @@ public final class Property: AttributeModelProtocol {
         
         public typealias Model = Property
                 
-        public static func < (lhs: Self, rhs: Self) -> Bool {
-            if lhs.key == rhs.key {
-                return lhs.rawValue < rhs.rawValue
-            } else {
-                return lhs.key < rhs.key
-            }
-        }
+//        public static func < (lhs: Self, rhs: Self) -> Bool {
+//            if lhs.keyBuilder == rhs.keyBuilder {
+//                return lhs.rawValue < rhs.rawValue
+//            } else {
+//                return lhs.keyBuilder < rhs.keyBuilder
+//            }
+//        }
 
         public static var random: Self { .random(.random) }
 
@@ -102,20 +102,7 @@ public final class Property: AttributeModelProtocol {
             }
         }
         
-        public var id: Int { self.hashValue }
-        
-        public var valueBuilder: ValueBuilder {
-            switch self {
-            case .input(let i): return .string(i.rawValue)
-            case .mode(let m): return .enumeror(m.toEnumeror)
-            case .system(let s): return .enumeror(s.toEnumeror)
-            case .format(let f): return .enumeror(f.toEnumeror)
-            }
-        }
-
-        public var rawValue: String {
-            self.valueBuilder.rawValue
-        }
+//        public var id: Int { self.hashValue }
         
         public var key: Key {
             self.keyBuilder.key
@@ -130,6 +117,15 @@ public final class Property: AttributeModelProtocol {
             }
         }
         
+        public var valueCompound: Compound.Str {
+            switch self {
+            case .input(let i): return .init(string: i.rawValue)
+            case .mode(let m): return .init(enumoror: m.toEnumeror)
+            case .system(let s): return .init(enumoror: s.toEnumeror)
+            case .format(let f): return .init(enumoror: f.toEnumeror)
+            }
+        }
+        
         public var attributeBuilder: Attribute.Builder? {
             switch self {
             case .input(let i): return .input(i)
@@ -137,11 +133,33 @@ public final class Property: AttributeModelProtocol {
             default: return nil
             }
         }
+        
+        public func asEnumerable<T: Enumerable>(_ type: T.Type = T.self) -> T? {
+            switch self {
+            case .mode(let modeEnum):
+                return modeEnum as? T
+            case .system(let systemBuilder):
+                return systemBuilder as? T
+            case .format(let formatBuilder):
+                return formatBuilder as? T
+            default: return nil
+            }
+        }
+        
+        public var compoundKey: Compound.Key {
+            .init(key: self.keyBuilder.id, value: self.valueCompound.id)
+        }
+
+        public var rawValue: String {
+            "(\(self.keyBuilder.rawValue)) \(self.valueCompound.rawValue)"
+        }
+        
+        public var persistentModelType: Persistent.Model.Enum { .property }
 
     }
     
     public private(set) var uuid: UUID
-    public private(set) var composite_key: String
+    public private(set) var compound_key: String
     public private(set) var key_builder_id: String
     public private(set) var value_id: String
     public private(set) var value_rawValue:  String
@@ -149,17 +167,12 @@ public final class Property: AttributeModelProtocol {
     public private(set) var games: Games = []
     public private(set) var platforms: [Platform] = []
 
-    private init(uuid: UUID, keyBuilder: Key.Builder, value: ValueBuilder) {
-        let composite: CompositeKey = .init(first: keyBuilder.id, last: value.id)
+    public init(uuid: UUID, builder: Builder) {
         self.uuid = uuid
-        self.key_builder_id = composite.first
-        self.value_id = composite.last
-        self.value_rawValue = value.rawValue
-        self.composite_key = composite.rawValue
-    }
-    
-    public convenience init(uuid: UUID, builder: Builder) {
-        self.init(uuid: uuid, keyBuilder: builder.keyBuilder, value: builder.valueBuilder)
+        self.key_builder_id = builder.keyBuilder.id
+        self.value_id = builder.valueCompound.id
+        self.value_rawValue =  builder.valueCompound.rawValue
+        self.compound_key = builder.compoundKey.yoke
     }
     
     public convenience init(builder: Builder) {
@@ -170,12 +183,8 @@ public final class Property: AttributeModelProtocol {
     
     public var keyBuilder: Key.Builder { self.builder.keyBuilder }
     
-    public var valueBuilder: ValueBuilder { self.builder.valueBuilder }
-        
-    public var rawValue: String {
-        "(\(self.keyBuilder.rawValue)) \(self.builder.rawValue)"
-    }
-        
+    public var valueCompound: Compound.Str { self.builder.valueCompound }
+            
 }
 
 
@@ -202,4 +211,17 @@ extension Property {
         return .init(predicate: #Predicate<Property> { $0.uuid == id })
     }
     
+//    public var debugMap: [String: String] {
+//        [
+//            "uuid": self.uuid.uuidString,
+//            "composite_key": self.composite_key,
+//            "key_builder_id": self.key_builder_id,
+//            "value_id": self.value_id,
+//            "value_rawValue": self.value_rawValue,
+//            "key": self.key.rawValue,
+//            "keyBuilder": self.keyBuilder.rawValue,
+//            "value": self.value.key
+//        ]
+//    }
+        
 }

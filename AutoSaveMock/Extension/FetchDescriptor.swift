@@ -18,12 +18,16 @@ public extension FetchDescriptor {
 
 extension FetchDescriptor where T: PersistentModelProtocol {
         
-    public static func getByUUID(model: Model.Key, _ uuid: UUID) -> Self {
+    public static func getByUUID(model: Persistent.Model.Enum, _ uuid: UUID) -> Self {
         .init(predicate: .getByUUID(model: model, uuid))
     }
     
-    public static func getByCompositeKey(model: Model.Key,_ composite: CompositeKey) -> Self {
-        .init(predicate: .getByCompositeKey(model: model, composite))
+    public static func getByCompositeKey(model: Persistent.Model.Enum,_ compound: Compound.Key) -> Self {
+        .init(predicate: .getByCompositeKey(model: model, compound))
+    }
+    
+    public static func getByCompositeKey(_ builder: T.Builder) -> Self {
+        .init(predicate: .getByBuilder(builder))
     }
     
 }

@@ -11,7 +11,7 @@ import SwiftUI
 
 extension Predicate {
 
-    public static func getByUUID<T: PersistentModelProtocol>(model: Model.Key, _ uuid: UUID) -> Predicate<T>? {
+    public static func getByUUID<T: PersistentModelProtocol>(model: Persistent.Model.Enum, _ uuid: UUID) -> Predicate<T>? {
         let id = uuid
         switch model {
         case .game:
@@ -23,16 +23,20 @@ extension Predicate {
         }
     }
     
-    public static func getByCompositeKey<T: PersistentModelProtocol>(model: Model.Key,_ composite: CompositeKey) -> Predicate<T>? {
-        let key: String = composite.rawValue
+    public static func getByCompositeKey<T: PersistentModelProtocol>(model: Persistent.Model.Enum,_ compound: Compound.Key) -> Predicate<T>? {
+        let key: String = compound.yoke
         switch model {
         case .game:
-            return #Predicate<Game> { $0.composite_key == key } as? Predicate<T>
+            return #Predicate<Game> { $0.compound_key == key } as? Predicate<T>
         case .property:
-            return #Predicate<Property> { $0.composite_key == key } as? Predicate<T>
+            return #Predicate<Property> { $0.compound_key == key } as? Predicate<T>
         case .platform:
-            return #Predicate<Platform> { $0.composite_key == key } as? Predicate<T>
+            return #Predicate<Platform> { $0.compound_key == key } as? Predicate<T>
         }
+    }
+    
+    public static func getByBuilder<T: PersistentModelProtocol>(_ builder: T.Builder) -> Predicate<T>? {
+        .getByCompositeKey(model: builder.persistentModelType, builder.compoundKey)
     }
     
 }

@@ -57,22 +57,30 @@ extension Array where Element: Collection, Element.Element: Hashable {
 
 extension Array where Element: Hashable {
     
-    public var toSet: Set<Element> {
-        .init(self)
+    public var deduped: Self {
+        self.asSet.map(\.self)
     }
     
 }
 
-extension Array where Element == Platform {
-    
-    public var toMap: [SystemBuilder: Set<FormatBuilder>] {
-        var dict: [SystemBuilder: Set<FormatBuilder>] = .init()
-        self.forEach { platform in
-            if let s = platform.systemBuilder, let f = platform.formatBuilder {
-                dict[s] = dict[s, default: .defaultValue] + f
-            }
-        }
-        return dict
+extension Array where Element: AttributeModelProtocol {
+        
+    public var attributeBuilderSet: AttributeBuilderSet {
+        self.compactMap(\.toAttributeBuilder).asSet
     }
     
 }
+
+//extension Array where Element == Platform {
+//    
+//    public var toMap: [SystemBuilder: Set<FormatBuilder>] {
+//        var dict: [SystemBuilder: Set<FormatBuilder>] = .init()
+//        self.forEach { platform in
+//            if let s = platform.systemBuilder, let f = platform.formatBuilder {
+//                dict[s] = dict[s, default: .defaultValue] + f
+//            }
+//        }
+//        return dict
+//    }
+//    
+//}

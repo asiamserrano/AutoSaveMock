@@ -19,10 +19,19 @@ public protocol Representable {
     var rawValue: String { get }
 }
 
-//public protocol Uuidable {
-//    var uuid: UUID { get }
+//public protocol EqualHash: Quad {}
+
+//extension EqualHash {
+//    
+//    public static func == (lhs: Self, rhs: Self) -> Bool {
+//        lhs.hashValue == rhs.hashValue
+//    }
+//    
 //}
 
+
+public protocol Trio: Identifiable, Equatable, Hashable {}
+public protocol Quad: Trio, Comparable {}
 
 
 public protocol Protocolable: Identifiable, Equatable, Hashable {}

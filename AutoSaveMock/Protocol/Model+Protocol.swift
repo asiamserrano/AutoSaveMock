@@ -8,75 +8,11 @@
 import Foundation
 import SwiftData
 
-public protocol PersistentProtocol: Representable {
+public protocol ModelProtocol: Identifiable, Hashable, Equatable, Representable {
+    var modelType: Persistent.Model.Enum { get }
     
-    typealias Persistent = any PersistentModelProtocol
+    func asModel<T: PersistentModelProtocol>(_ type: T.Type) -> T?
     
-}
-
-public protocol PersistentModelBuilderProtocol: Identifiable, Hashable, Comparable, Equatable, Randomizable, Representable {
-    
-    associatedtype Model: PersistentModelProtocol
-    
-    init(model: Model)
-    
-}
-
-//extension PersistentModelBuilderProtocol where Model.Builder == Self {
-//    
-//    public var model: Model {
-//        .init(builder: self)
-//    }
-//    
-//}
-
-public protocol PersistentModelProtocol: PersistentModel, PersistentProtocol {
-    
-    associatedtype Builder: PersistentModelBuilderProtocol
-    
-    init(builder: Builder)
-    
-    var uuid: UUID { get }
-    var composite_key: String { get }
-    
-}
-
-extension PersistentModelProtocol {
-    
-    public var info: [String] {
-        [
-            self.persistentModelID.entityName,
-            self.persistentModelID.hashValue.description,
-            self.persistentModelID.storeIdentifier
-        ].compactMap(\.self)
-    }
-    
-    public var composite: CompositeKey {
-        .init(model: self)
-    }
-    
-}
-
-extension PersistentModelProtocol where Builder.Model == Self {
-    
-    public var builder: Builder {
-        .init(model: self)
-    }
-    
-}
-
-public protocol AttributeModelProtocol: PersistentModelProtocol {
-    
-    typealias Games = [Game]
-    
-    var games: Games { get }
-    
-}
-
-public protocol ModelProtocol: Identifiable, Hashable, Equatable, Comparable, PersistentProtocol {
-            
-    var persistent: Persistent { get }
-    var key: Model.Key { get }
 }
 
 extension ModelProtocol {
@@ -86,19 +22,17 @@ extension ModelProtocol {
     }
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
-        if lhs.key == rhs.key {
+        if lhs.modelType == rhs.modelType {
             return lhs.rawValue < rhs.rawValue
         } else {
-            return lhs.key < rhs.key
+            return lhs.modelType < rhs.modelType
         }
     }
     
     public var id: Int { self.hashValue }
     
-    public var rawValue: String { self.persistent.rawValue }
-    
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.key)
+        hasher.combine(self.modelType)
         hasher.combine(self.rawValue)
     }
     
@@ -123,7 +57,7 @@ extension ModelProtocol {
 
  }
 
- public enum Model.Key: Encapsulable {
+ public enum Persisted.Model: Encapsulable {
      
      case game, property, platform
      
@@ -143,7 +77,7 @@ extension ModelProtocol {
 
  public protocol OldPersistentModelBuilderProtocol: Identifiable, Hashable, Equatable, Comparable, Representable {
      var model: Model { get }
-     var type: Model.Key { get }
+     var type: Persisted.Model { get }
  }
 
  extension OldPersistentModelBuilderProtocol {
@@ -219,7 +153,7 @@ extension ModelProtocol {
          }
      }
      
-     public var type: Model.Key {
+     public var type: Persisted.Model {
          switch self {
          case .game: return .game
          case .property: return .property

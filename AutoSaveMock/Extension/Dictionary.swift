@@ -21,6 +21,16 @@ extension Dictionary: Defaultable {
     
 }
 
+extension Dictionary where Key == Attribute.Enum.Builder, Value == AttributeBuilderSet {
+    
+    public init(_ value: Value) {
+        self = .init(uniqueKeysWithValues: value.keyBuilders.map { key in
+            (key, value.filter(key))
+        })
+    }
+    
+}
+
 //extension Dictionary: Quantifiable {
 //    
 //    public var quantity: Int { self.count }

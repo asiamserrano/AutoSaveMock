@@ -7,59 +7,17 @@
 
 import Foundation
 
-public protocol Iterable: Indexable, Representable, Randomizable, CaseIterable {
-    static var cases: Cases { get }
-    var id: String { get }
-}
 
-public extension Iterable {
-    
-    typealias Cases = [Self]
-    
-    static var random: Self {
-        Self.cases.random
-    }
-    
-    static var className: String {
-        String(describing: Self.self)
-    }
-    
-    static var defaultValue: Self {
-        Self.cases.first!
-    }
-    
-    static var cases: Cases {
-        Self.allCases.map { $0 }
-    }
-    
-    static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.index < rhs.index
-    }
-    
-    var next: Self {
-        let v: Int = index + 1
-        return Self.cases[v == Self.cases.count ? 0 : v]
-    }
-    
-//    var signature: [String] { [self.id, self.rawValue, self.description] }
 
-    var index: Int { Self.cases.firstIndex(of: self) ?? -1 }
-    
-    var id: String { "\(self.index)_\(self.description)_\(self.className)" }
-    
-    var className: String { Self.className }
-    
-    var description: String { String(describing: self) }
-    
-    var rawValue: String { self.description.capitalized }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-        hasher.combine(self.rawValue)
-        hasher.combine(self.description)
-    }
-    
-}
+//public protocol Iterable: Quad, Representable, Randomizable, CaseIterable {
+//    var id: String { get }
+//}
+
+//public extension Iterable {
+//    
+//    
+//    
+//}
 
 
 //public protocol Provable: Identifiable, Equatable, Hashable {}

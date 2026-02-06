@@ -8,17 +8,35 @@
 import Foundation
 
 
-public protocol Enumerable: Iterable {
-    static var enumerors: [Enumeror] { get }
-}
+public protocol Enumerable: Quad, Representable, Randomizable, CaseIterable {}
 
 public extension Enumerable {
     
-    static var enumerors: [Enumeror] { Self.cases.enumerors }
-    
-    static func contains(_ enumeror: Enumeror) -> Bool {
-        Self.convert(enumeror) != nil
+    static var className: String {
+        String(describing: Self.self)
     }
+    
+    var className: String { Self.className }
+    
+    var description: String { String(describing: self) }
+    
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.index < rhs.index
+    }
+    
+    var id: String { "\(self.index)_\(self.description)_\(self.className)" }
+    
+    var rawValue: String { self.description.capitalized }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.id)
+        hasher.combine(self.rawValue)
+        hasher.combine(self.description)
+    }
+        
+//    static func contains(_ enumeror: Enumeror) -> Bool {
+//        Self.convert(enumeror) != nil
+//    }
     
     static func convert(_ enumeror: Enumeror) -> Self? {
         Self.cases.first(where: {
@@ -48,12 +66,4 @@ public extension Enumerable {
         .init(enumerable: self)
     }
      
-}
-
-extension Array where Element: Enumerable {
-    
-    public var enumerors: [Enumeror] {
-        self.map(\.toEnumeror)
-    }
-    
 }

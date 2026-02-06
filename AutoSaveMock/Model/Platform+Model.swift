@@ -11,7 +11,11 @@ import SwiftData
 @Model
 public final class Platform: AttributeModelProtocol {
     
-    public struct Builder: PersistentModelBuilderProtocol, Iterable {
+    public struct Builder: PersistentModelBuilderProtocol, CaseIterable {
+        
+        public static var random: Platform.Builder {
+            Self.cases.randomElement()!
+        }
         
         public typealias Model = Platform
         
@@ -34,25 +38,27 @@ public final class Platform: AttributeModelProtocol {
                 fatalError("Unable to cast system '\(system.rawValue)' and format '\(format.rawValue)' to platform builder")
             }
         }
-
+        
         public init(model: Model) {
-            if let s = model.systemBuilder, let f = model.formatBuilder {
+            if let s = model.system?.builder.asEnumerable(SystemBuilder.self),
+                let f = model.format?.builder.asEnumerable(FormatBuilder.self) {
                 self = .init(system: s, format: f)
             } else {
                 fatalError("Unable to cast model to platform builder")
             }
         }
         
+        public var attributeBuilder: Attribute.Builder { .platform(self) }
+        
+        public var compoundKey: Compound.Key {
+            .init(key: self.system.id, value: self.format.id)
+        }
+        
         public var rawValue: String {
             "\(self.system.rawValue) | \(self.format.rawValue)"
         }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(self.system)
-            hasher.combine(self.format)
-        }
-        
-        public var attributeBuilder: Attribute.Builder { .platform(self) }
+
+        public var persistentModelType: Persistent.Model.Enum { .platform }
         
     }
 
@@ -60,67 +66,45 @@ public final class Platform: AttributeModelProtocol {
     public var properties: [Property] = [] // Initialize array to prevent potential bugs
     public private(set) var games: Games = []
     public private(set) var uuid: UUID
-    public private(set) var composite_key: String
+    public private(set) var compound_key: String
     
-    public required init(_ primary: Property?, _ secondary: Property?, _ uuid: UUID? = nil) {
+    private init(uuid: UUID?, properties: PropertyArray = .defaultValue, key: String = .defaultValue) {
         self.uuid = uuid ?? .init()
-        if let p = primary, let s = secondary {
-            self.properties = .init(p, s)
-            self.composite_key = CompositeKey(first: p.uuid.uuidString, last: s.uuid.uuidString).rawValue
+        self.properties = properties
+        self.compound_key = key
+    }
+    
+    public convenience init(builder: Builder, map: [Property.Builder: Property], _ uuid: UUID? = nil) {
+        if let primary = map[.system(builder.system)], let secondary = map[.format(builder.format)] {
+            let properties = [primary, secondary]
+            let key = builder.compoundKey.yoke
+            self.init(uuid: uuid, properties: properties, key: key)
         } else {
-            self.properties = .defaultValue
-            self.composite_key = .defaultValue
+            self.init(uuid: uuid)
         }
     }
-
-    public convenience init(builder: Builder, map: [Property.Builder: Property]) {
-        if let primary = map[.system(builder.system)], let secondary = map[.format(builder.format)] {
-            self.init(primary, secondary)
+    
+    public convenience init(_ primary: Property?, _ secondary: Property?, _ uuid: UUID? = nil) {
+        if let p = primary, let s = secondary, let system = p.builder.asEnumerable(SystemBuilder.self), let format = s.builder.asEnumerable(FormatBuilder.self) {
+            let builder: Builder = .init(system: system, format: format)
+            let map: [Property.Builder: Property] = [p.builder: p, s.builder: s]
+            self.init(builder: builder, map: map)
         } else {
-            self.init(nil, nil)
+            self.init(uuid: uuid)
         }
     }
     
     public convenience init(builder: Builder) {
-        self.init(builder: builder, map: .defaultValue)
+        self.init(uuid: nil)
     }
 
-    public var rawValue: String {
-        let s: String = self.system?.value_rawValue ?? .defaultValue
-        let f: String = self.format?.value_rawValue ?? .defaultValue
-        return "\(s) | \(f)"
+    public var system: Property? { self.get(.system) }
+    public var format: Property? { self.get(.format) }
+    public var systemBuilder: SystemBuilder { self.builder.system }
+    public var formatBuilder: FormatBuilder { self.builder.format }
+    
+    private func get(_ key: Property.Key) -> Property? {
+        self.properties.first(where: { $0.key == key })
     }
     
-    public var system: Property? {
-        self.properties.first(where: { $0.key == .system })
-    }
-    
-    public var systemBuilder: SystemBuilder? {
-        if let system = system {
-            switch system.builder {
-            case .system(let s): return s
-            default: return nil
-            }
-        } else { return nil }
-    }
-    
-    public var format: Property? {
-        self.properties.first(where: { $0.key == .format })
-    }
-    
-    public var formatBuilder: FormatBuilder? {
-        if let format = format {
-            switch format.builder {
-            case .format(let f): return f
-            default: return nil
-            }
-        } else { return nil }
-    }
-    
-    public var builder: Builder? {
-        if let s = self.systemBuilder, let f = self.formatBuilder {
-            return .init(system: s, format: f)
-        } else { return nil }
-    }
-
 }
