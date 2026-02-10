@@ -25,10 +25,10 @@ public final class Property: AttributeModelProtocol {
             
             public var enumeror: Enumeror {
                 switch self {
-                case .input(let i): return i.toEnumeror
-                case .mode: return self.key.toEnumeror
-                case .system(let s): return s.toEnumeror
-                case .format(let f): return f.toEnumeror
+                case .input(let i): return i
+                case .mode: return self.key
+                case .system(let s): return s
+                case .format(let f): return f
                 }
             }
             
@@ -67,6 +67,18 @@ public final class Property: AttributeModelProtocol {
     
     public enum Builder: PersistentModelBuilderProtocol {
         
+        
+//        public struct Collection {
+//            
+//            public var elements: Elements
+//            
+//            public init(elements: Elements) {
+//                self.elements = elements
+//            }
+//            
+//        }
+       
+        
         public typealias Model = Property
                 
 //        public static func < (lhs: Self, rhs: Self) -> Bool {
@@ -93,6 +105,8 @@ public final class Property: AttributeModelProtocol {
         case system(SystemBuilder)
         case format(FormatBuilder)
         
+        // Unable to parse key: 3_os_SystemEnum
+        
         public init(model: Model) {
             switch Key.Builder(model.key_builder_id) {
             case .input(let inputEnum): self = .input(.init(inputEnum, model.value_rawValue))
@@ -102,6 +116,26 @@ public final class Property: AttributeModelProtocol {
             }
         }
         
+//        public var attributeBuilder: Generic.Attribute.Builder? {
+//            switch self {
+//            case .input(let i): return .input(i)
+//            case .mode(let m): return .mode(m)
+//            default: return nil
+//            }
+//        }
+
+        public func asEnumerable<T: Enumerable>(_ type: T.Type = T.self) -> T? {
+            switch self {
+            case .mode(let modeEnum):
+                return modeEnum as? T
+            case .system(let systemBuilder):
+                return systemBuilder as? T
+            case .format(let formatBuilder):
+                return formatBuilder as? T
+            default: return nil
+            }
+        }
+
 //        public var id: Int { self.hashValue }
         
         public var key: Key {
@@ -120,29 +154,9 @@ public final class Property: AttributeModelProtocol {
         public var valueCompound: Compound.Str {
             switch self {
             case .input(let i): return .init(string: i.rawValue)
-            case .mode(let m): return .init(enumoror: m.toEnumeror)
-            case .system(let s): return .init(enumoror: s.toEnumeror)
-            case .format(let f): return .init(enumoror: f.toEnumeror)
-            }
-        }
-        
-        public var attributeBuilder: Attribute.Builder? {
-            switch self {
-            case .input(let i): return .input(i)
-            case .mode(let m): return .mode(m)
-            default: return nil
-            }
-        }
-        
-        public func asEnumerable<T: Enumerable>(_ type: T.Type = T.self) -> T? {
-            switch self {
-            case .mode(let modeEnum):
-                return modeEnum as? T
-            case .system(let systemBuilder):
-                return systemBuilder as? T
-            case .format(let formatBuilder):
-                return formatBuilder as? T
-            default: return nil
+            case .mode(let m): return .init(enumerable: m)
+            case .system(let s): return .init(enumerable: s)
+            case .format(let f): return .init(enumerable: f)
             }
         }
         
@@ -154,7 +168,9 @@ public final class Property: AttributeModelProtocol {
             "(\(self.keyBuilder.rawValue)) \(self.valueCompound.rawValue)"
         }
         
-        public var persistentModelType: Persistent.Model.Enum { .property }
+        public var modelBuilder: Generic.Model.Builder {
+            .property(self)
+        }
 
     }
     
@@ -169,7 +185,7 @@ public final class Property: AttributeModelProtocol {
 
     public init(uuid: UUID, builder: Builder) {
         self.uuid = uuid
-        self.key_builder_id = builder.keyBuilder.id
+        self.key_builder_id = builder.compoundKey.id
         self.value_id = builder.valueCompound.id
         self.value_rawValue =  builder.valueCompound.rawValue
         self.compound_key = builder.compoundKey.yoke
@@ -184,14 +200,17 @@ public final class Property: AttributeModelProtocol {
     public var keyBuilder: Key.Builder { self.builder.keyBuilder }
     
     public var valueCompound: Compound.Str { self.builder.valueCompound }
+    
+//    public var attribute: Generic.Attribute.Model { .property(self) }
+
+    public var model: Generic.Model { .property(self) }
+
             
 }
 
 
 extension Property {
-    
-    public static var random: Property { .init(builder: .random) }
-    
+        
     public static func getByKeyBuilder(_ keyBuilder: Property.Key.Builder) -> FetchDescriptor<Property> {
         let id: String = keyBuilder.id
         return .init(predicate: #Predicate {
@@ -211,17 +230,55 @@ extension Property {
         return .init(predicate: #Predicate<Property> { $0.uuid == id })
     }
     
-//    public var debugMap: [String: String] {
-//        [
-//            "uuid": self.uuid.uuidString,
-//            "composite_key": self.composite_key,
-//            "key_builder_id": self.key_builder_id,
-//            "value_id": self.value_id,
-//            "value_rawValue": self.value_rawValue,
-//            "key": self.key.rawValue,
-//            "keyBuilder": self.keyBuilder.rawValue,
-//            "value": self.value.key
-//        ]
-//    }
+    public var debugMap: [String: String] {
+        [
+            "uuid": self.uuid.uuidString,
+            "compound_key": self.compound_key,
+            "key_builder_id": self.key_builder_id,
+            "value_id": self.value_id,
+            "value_rawValue": self.value_rawValue
+        ]
+    }
         
+}
+
+extension Property.Builder {
+    
+    public var debugMap: [String: String] {
+        [
+            "id": self.id,
+            "modelType": self.modelType.rawValue,
+            "key": self.key.rawValue,
+            "keyBuilder": self.keyBuilder.rawValue,
+            "valueCompound_id": self.valueCompound.id,
+            "valueCompound_rawValue": self.valueCompound.rawValue,
+            "valueCompound_yoke": self.valueCompound.yoke,
+            "compoundKey": self.compoundKey.id,
+            "compoundKey_rawValue": self.compoundKey.rawValue,
+            "compoundKey_yoke": self.compoundKey.yoke,
+            "rawValue": self.rawValue
+        ]
+    }
+    
+}
+
+extension Generic.Collection<Property.Builder> {
+    
+//    public typealias Element = Property.Builder
+    
+    public typealias E = Property.Key.Builder
+    
+    public static func random(_ size: Int) -> Self {
+        return .init(collection: E.cases.flatMap { Self.random($0, size) })
+    }
+    
+    public static func random(_ key: E, _ size: Int) -> Self {
+        switch key {
+        case .input(let i): return .init(collection: Set<String>.init(size).map { .input(.init(i, $0))})
+        case .mode: return .init(collection: ModeEnum.cases.subset(size).map { .mode($0) })
+        case .format: return .init(collection: FormatBuilder.cases.subset(size).map { .format($0) })
+        case .system: return .init(collection: SystemBuilder.cases.subset(size).map { .system($0) })
+        }
+    }
+    
 }

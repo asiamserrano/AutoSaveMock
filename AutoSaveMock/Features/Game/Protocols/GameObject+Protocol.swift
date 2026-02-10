@@ -15,11 +15,14 @@ public protocol GameObjectProtocol {
     var uuid: UUID { get }
     var status: Game.Status { get }
     var boxart: Data? { get }
-    var attributes: Attribute.Builders { get }
+    var added: Date { get }
+//    var attributes: Attribute.Builders { get }
     
 }
 
 extension GameObjectProtocol {
+    
+    public typealias Attributes = Generic.Attribute.Builder.Collection
     
     public var compoundKey: Compound.Key {
         .init(key: self.title.canonicalized, value: self.release.dashless)

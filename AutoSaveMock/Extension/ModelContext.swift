@@ -53,7 +53,7 @@ extension ModelContext {
         self.fetch(all: Property.getByKeyBuilder(keyBuilder))
     }
     
-    public func fetchByUUID<T: PersistentModelProtocol>(model: Persistent.Model.Enum, _ uuid: UUID) -> T? {
+    public func fetchByUUID<T: PersistentModelProtocol>(model: Generic.Model.Enum, _ uuid: UUID) -> T? {
         self.fetch(first: .getByUUID(model: model, uuid))
     }
 //    
@@ -94,18 +94,18 @@ private extension ModelContext {
         self.remove(properties, { $0.games.isEmpty })
     }
     
-    func remove(_ platforms: [Platform]) {
-        let properties: [Property] = platforms.filter { platform in
-            if platform.games.isEmpty || platform.properties.count < 2 {
-                self.delete(platform)
-                return true
-            } else { return false }
-        }.flatMap(\.properties).deduped
-        
-        self.store()
-        
-        self.remove(properties, { $0.platforms.isEmpty })
-    }
+//    func remove(_ platforms: [Platform]) {
+//        let properties: [Property] = platforms.filter { platform in
+//            if platform.games.isEmpty || platform.properties.count < 2 {
+//                self.delete(platform)
+//                return true
+//            } else { return false }
+//        }.flatMap(\.properties).deduped
+//        
+//        self.store()
+//        
+//        self.remove(properties, { $0.platforms.isEmpty })
+//    }
     
     func remove(_ properties: [Property], _ action: (Property) -> Bool) {
         properties.forEach { property in

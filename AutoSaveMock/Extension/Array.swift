@@ -55,21 +55,21 @@ extension Array where Element: Collection, Element.Element: Hashable {
     
 }
 
-extension Array where Element: Hashable {
-    
-    public var deduped: Self {
-        self.asSet.map(\.self)
-    }
-    
-}
+//extension Array where Element: Hashable {
+//    
+//    public var deduped: Self {
+//        self.asSet.map(\.self)
+//    }
+//    
+//}
 
-extension Array where Element: AttributeModelProtocol {
-        
-    public var attributeBuilderSet: AttributeBuilderSet {
-        self.compactMap(\.toAttributeBuilder).asSet
-    }
-    
-}
+//extension Array where Element: AttributeModelProtocol {
+//        
+//    public var collection: Generic.Attribute.Builder.Collection {
+//        .init(collection: self.map(\.attribute.builder))
+//    }
+//    
+//}
 
 //extension Array where Element == Platform {
 //    

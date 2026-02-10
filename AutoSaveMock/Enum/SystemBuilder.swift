@@ -20,10 +20,10 @@ public enum SystemBuilder: Encapsulable {
 
     public var enumeror: Enumeror {
         switch self {
-        case .playstation(let p): return p.toEnumeror
-        case .nintendo(let n): return n.toEnumeror
-        case .xbox(let x): return x.toEnumeror
-        case .os(let o): return o.toEnumeror
+        case .playstation(let p): return p
+        case .nintendo(let n): return n
+        case .xbox(let x): return x
+        case .os(let o): return o
         }
     }
     

@@ -16,10 +16,10 @@ extension Collection {
     public var optional: Self? {
         self.isEmpty ? nil : self
     }
-    
-    public func mapped<T: Hashable>(_ action: @escaping (Element) -> T) -> Set<T> {
-        self.map(action).asSet
-    }
+//    
+//    public func mapped<T: Hashable>(_ action: @escaping (Element) -> T) -> Set<T> {
+//        self.map(action).asSet
+//    }
     
 }
 
@@ -31,14 +31,14 @@ extension Collection where Element: Hashable, Element: Comparable {
     
 }
 
-extension Collection where Element: Hashable {
-    
-    public var asSet: Set<Element> {
-        .init(self)
-    }
-    
-    public func filtered(_ action: @escaping (Element) -> Bool) -> Set<Element> {
-        self.filter(action).asSet
-    }
-    
-}
+//extension Collection where Element: Hashable {
+//    
+//    public var asSet: Set<Element> {
+//        .init(self)
+//    }
+//    
+//    public func filtered(_ action: @escaping (Element) -> Bool) -> Set<Element> {
+//        self.filter(action).asSet
+//    }
+//    
+//}

@@ -6,46 +6,80 @@
 //
 
 import Foundation
+import SwiftUI
+
+extension Game.Observer: GameObjectProtocol {
+    
+    public var attributes: Attributes {
+        .init(collection: self.allEntries)
+    }
+    
+}
+
+extension Game.Observer: ContainerProtocol {
+    
+    public static func filter(_ entry: Entry) -> Key { entry.attributeBuilderType }
+    
+    public typealias Key = Generic.Attribute.Enum.Builder
+    public typealias Value = Generic.Attribute.Builder.Collection
+    public typealias Index = Keys.Index
+    
+}
+
+extension Game.Observer {
+    
+    public enum Mutation {
+        case insert, remove
+    }
+    
+    public convenience init(game: Game) {
+        self.init(builder: game.builder, game.attributes)
+    }
+    
+}
+
+public extension Game.Observer {
+    
+    func insert(_ entry: Entry) {
+        self.update(entry, .insert)
+    }
+
+    func remove(_ entry: Entry) {
+        self.update(entry, .remove)
+    }
+
+    var current: Game.Snapshot {
+        .init(observer: self)
+    }
+    
+    var isEditing: Bool {
+        self.editMode == .active
+    }
+    
+}
+
+private extension Game.Observer {
+    
+    func update(_ entry: Entry, _ mutation: Mutation) {
+        let key = entry.attributeBuilderType
+        self.container[key] = self.update(key, entry, mutation)
+    }
+
+    func update(_ key: Key, _ entry: Entry, _ mutation: Mutation) -> Value {
+        let value = self.value(key)
+        switch mutation {
+        case .insert: return value.insert(entry)
+        case .remove: return value.remove(entry)
+        }
+    }
+
+    
+}
 
 
 //    public class Observer: ObservableObject, Observable, GameObjectProtocol {
 //
-//        public struct Snapshot: Hashable, GameObjectProtocol {
-//
-//            public let uuid: UUID
-//            public let title: String
-//            public let release: Date
-//            public let boxart: Data?
-//            public let status: Game.Status
-//            public let attributes: AttributeBuilderSet
-//
-//            public init(builder: Builder, _ attrs: AttributeBuilderSet) {
-//                self.title = builder.title
-//                self.release = builder.release
-//                self.boxart = builder.boxart
-//                self.uuid = builder.uuid
-//                self.attributes = attrs
-//                self.status = builder.status
-//            }
-//
-//            public init(observer: Observer) {
-//                self.title = observer.title.trimmed
-//                self.release = observer.release
-//                self.boxart = observer.boxart
-//                self.uuid = observer.uuid
-//                self.attributes = observer.attributes.map(\.value).flatten
-//                self.status = observer.status
-//            }
-//
-//            public func hash(into hasher: inout Hasher) {
-//                hasher.combine(self.title.trimmed)
-//                hasher.combine(self.release.dashless)
-//                hasher.combine(self.boxart)
-//                hasher.combine(self.status)
-//                hasher.combine(self.attributes)
-//            }
-//
-//        }
+//        
 //
 //        public typealias Element = Attribute.Element
 //        public typealias Mutation = Element.Mutation
@@ -134,12 +168,12 @@ import Foundation
 //            self.attributes = self.snapshot.attributes.toAttributes
 //        }
 //
-////        public func save() -> Void {
-////            self.added = .defaultValue
-////            self.deleted = .defaultValue
-////            self.tracker = .init(self)
-////        }
-//
+//        public func save() -> Void {
+//            self.added = .defaultValue
+//            self.deleted = .defaultValue
+//            self.tracker = .init(self)
+//        }
+
 //        public var isEditing: Bool { self.editMode == .active }
 //
 //        public var isDisabled: Bool {

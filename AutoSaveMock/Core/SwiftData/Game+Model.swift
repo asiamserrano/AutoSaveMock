@@ -38,6 +38,8 @@ public final class Game: PersistentModelProtocol {
         self.boxart = builder.boxart
         self.compound_key = builder.compoundKey.rawValue
     }
+    
+    public var model: Generic.Model { .game(self) }
         
 }
 
@@ -45,17 +47,9 @@ extension Game: GameObjectProtocol {
     
     public var status: Game.Status { .init(self.status_bool) }
     
-    public var attributes: Attribute.Builders {
-        self.properties.attributeBuilderSet
-            .union(self.platforms.attributeBuilderSet)
-    }
-    
-}
-
-extension Game: Randomizable {
-    
-    public static var random: Self {
-        .init(builder: .random)
+    public var attributes: Attributes {
+        .defaultValue
+//        self.properties.collection.union(self.platforms.collection)
     }
     
 }

@@ -18,8 +18,8 @@ public enum FormatBuilder: Encapsulable {
     
     public var enumeror: Enumeror {
         switch self {
-        case .digital(let d): return d.toEnumeror
-        case .physical(let p): return p.toEnumeror
+        case .digital(let d): return d
+        case .physical(let p): return p
         }
     }
 

@@ -17,7 +17,7 @@
 //        
 //                ForEach(Attribute.Key.Builder.cases) { c in
 //                    NavigationLink(destination: {
-//                        AttributeBuilderView(Attribute.Builder.random(c, size))
+//                        AttributeBuilderView(Generic.Attribute.Builder.random(c, size))
 //                    }, label: {
 //                        Text(c.rawValue)
 //                    })

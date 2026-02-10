@@ -12,19 +12,11 @@ import SwiftData
 public final class Platform: AttributeModelProtocol {
     
     public struct Builder: PersistentModelBuilderProtocol, CaseIterable {
-        
-        public static var random: Platform.Builder {
-            Self.cases.randomElement()!
-        }
-        
+
         public typealias Model = Platform
         
         public static var allCases: Cases {
             SystemBuilder.cases.flatMap(\.platformBuilders)
-        }
-        
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.hashValue == rhs.hashValue
         }
         
         let system: SystemBuilder
@@ -47,9 +39,7 @@ public final class Platform: AttributeModelProtocol {
                 fatalError("Unable to cast model to platform builder")
             }
         }
-        
-        public var attributeBuilder: Attribute.Builder { .platform(self) }
-        
+                
         public var compoundKey: Compound.Key {
             .init(key: self.system.id, value: self.format.id)
         }
@@ -58,10 +48,14 @@ public final class Platform: AttributeModelProtocol {
             "\(self.system.rawValue) | \(self.format.rawValue)"
         }
 
-        public var persistentModelType: Persistent.Model.Enum { .platform }
+        public var modelBuilder: Generic.Model.Builder {
+            .platform(self)
+        }
+        
+        public var attributeBuilder: Generic.Attribute.Builder { .platform(self) }
         
     }
-
+    
     @Relationship(inverse: \Property.platforms)
     public var properties: [Property] = [] // Initialize array to prevent potential bugs
     public private(set) var games: Games = []
@@ -106,5 +100,10 @@ public final class Platform: AttributeModelProtocol {
     private func get(_ key: Property.Key) -> Property? {
         self.properties.first(where: { $0.key == key })
     }
+    
+//    public var attribute: Generic.Attribute.Model { .platform(self) }
+    
+    public var model: Generic.Model { .platform(self) }
+
     
 }

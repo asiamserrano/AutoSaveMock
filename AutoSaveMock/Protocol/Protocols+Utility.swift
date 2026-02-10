@@ -31,8 +31,10 @@ public protocol Representable {
 
 
 public protocol Trio: Identifiable, Equatable, Hashable {}
-public protocol Quad: Trio, Comparable {}
 
+public protocol Quad: Trio, Comparable {
+    typealias Collection = Generic.Collection<Self>
+}
 
 public protocol Protocolable: Identifiable, Equatable, Hashable {}
 

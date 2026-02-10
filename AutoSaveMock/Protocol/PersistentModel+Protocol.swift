@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-public protocol PersistentModelProtocol: PersistentModel, Representable {
+public protocol PersistentModelProtocol: PersistentModel, Representable, Randomizable {
     
     associatedtype Builder: PersistentModelBuilderProtocol where Builder.Model == Self
     
@@ -17,9 +17,15 @@ public protocol PersistentModelProtocol: PersistentModel, Representable {
     var uuid: UUID { get }
     var compound_key: String { get }
     
+    var model: Generic.Model { get }
+    
 }
 
 extension PersistentModelProtocol {
+    
+    public static var random: Self {
+        .init(builder: .random)
+    }
     
 //    public static func equals(_ a: Self, _ b: Self) -> Bool {
 //        a.uuid == b.uuid
@@ -41,9 +47,9 @@ extension PersistentModelProtocol {
         .init(model: self)
     }
     
-    public var persistentModelType: Persistent.Model.Enum {
-        self.builder.persistentModelType
-    }
+//    public var persistentModelType: Persistent.Model.Enum {
+//        self.builder.persistentModelType
+//    }
     
     public var rawValue: String {
         self.builder.rawValue
@@ -51,6 +57,10 @@ extension PersistentModelProtocol {
     
     public var compoundKey: Compound.Key {
         self.builder.compoundKey
+    }
+    
+    public var modelType: Generic.Model.Enum {
+        self.builder.modelType
     }
 
 }

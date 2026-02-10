@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 public protocol ModelProtocol: Identifiable, Hashable, Equatable, Representable {
-    var modelType: Persistent.Model.Enum { get }
+    var modelType: Generic.Model.Enum { get }
     
     func asModel<T: PersistentModelProtocol>(_ type: T.Type) -> T?
     

@@ -7,18 +7,11 @@
 
 import Foundation
 
-public protocol PersistentModelBuilderProtocol: Quad, Randomizable, Representable {
-    
-    associatedtype Model: PersistentModelProtocol where Model.Builder == Self
-    
-    init(model: Model)
-    
+public protocol Compoundable: Quad {
     var compoundKey: Compound.Key { get }
-    var persistentModelType: Persistent.Model.Enum { get }
-
 }
 
-extension PersistentModelBuilderProtocol {
+extension Compoundable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.compoundKey < rhs.compoundKey
@@ -32,6 +25,25 @@ extension PersistentModelBuilderProtocol {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.compoundKey)
+    }
+    
+}
+
+
+public protocol PersistentModelBuilderProtocol: Compoundable, Randomizable, Representable {
+    
+    associatedtype Model: PersistentModelProtocol where Model.Builder == Self
+    
+    init(model: Model)
+    
+    var modelBuilder: Generic.Model.Builder { get }
+
+}
+
+extension PersistentModelBuilderProtocol {
+        
+    public var modelType: Generic.Model.Enum {
+        self.modelBuilder.modelType
     }
     
 }

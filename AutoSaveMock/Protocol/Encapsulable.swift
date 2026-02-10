@@ -8,13 +8,15 @@
 import Foundation
 
 public protocol Encapsulable: Enumerable {
+    
+    typealias Enumeror = any Enumerable
+    
     var enumeror: Enumeror { get }
+    
 }
 
 extension Encapsulable {
-    
-    public static var enumerors: [Enumeror] { Self.cases.map { $0.enumeror } }
-    
+        
     public var id: String {
         self.enumeror.id
     }

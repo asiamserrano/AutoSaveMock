@@ -9,7 +9,7 @@ import Foundation
 
 public extension Game {
     
-    func insert(_ attribute: Persistent.Model.Attribute?) -> Void {
+    func insert(_ attribute: Generic.Attribute.Model?) -> Void {
         if let attribute = attribute {
             switch attribute {
             case .property(let property): self.properties.append(property)

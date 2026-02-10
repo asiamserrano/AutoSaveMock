@@ -10,6 +10,11 @@ import Foundation
 public struct Compound {
     
     public struct Key: CompoundProtocol {
+        
+        public static func str(_ s: Str) -> Self {
+            s.key
+        }
+        
         public let id: String
         public let rawValue: String
 
@@ -21,14 +26,19 @@ public struct Compound {
     }
     
     public struct Str: CompoundProtocol {
-        private  let key: Key
+    
+        public let key: Key
+        
+        private init(key: Key) {
+            self.key = key
+        }
 
         public init(string s: String) {
             self.key = .init(key: s.canonicalized, value: s.trimmed)
         }
         
-        public init(enumoror e: Enumeror)  {
-            self.key = .init(key: e.id, value: e.rawValue)
+        public init<T: Enumerable>(enumerable t: T)  {
+            self.key = .init(key: t.id, value: t.rawValue)
         }
         
         public var id: String { self.key.id }

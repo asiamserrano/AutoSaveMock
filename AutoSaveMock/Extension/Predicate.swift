@@ -11,7 +11,7 @@ import SwiftUI
 
 extension Predicate {
 
-    public static func getByUUID<T: PersistentModelProtocol>(model: Persistent.Model.Enum, _ uuid: UUID) -> Predicate<T>? {
+    public static func getByUUID<T: PersistentModelProtocol>(model: Generic.Model.Enum, _ uuid: UUID) -> Predicate<T>? {
         let id = uuid
         switch model {
         case .game:
@@ -23,7 +23,7 @@ extension Predicate {
         }
     }
     
-    public static func getByCompositeKey<T: PersistentModelProtocol>(model: Persistent.Model.Enum,_ compound: Compound.Key) -> Predicate<T>? {
+    public static func getByCompositeKey<T: PersistentModelProtocol>(model: Generic.Model.Enum,_ compound: Compound.Key) -> Predicate<T>? {
         let key: String = compound.yoke
         switch model {
         case .game:
@@ -36,7 +36,7 @@ extension Predicate {
     }
     
     public static func getByBuilder<T: PersistentModelProtocol>(_ builder: T.Builder) -> Predicate<T>? {
-        .getByCompositeKey(model: builder.persistentModelType, builder.compoundKey)
+        .getByCompositeKey(model: builder.modelType, builder.compoundKey)
     }
     
 }

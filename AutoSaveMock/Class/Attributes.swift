@@ -59,7 +59,7 @@
 //
 //extension Attributes {
 //    
-//    public typealias Key = Attribute.Enum.Builder
+//    public typealias Key = Generic.Generic.Attribute.Builder.Enum
 //    public typealias Values = AttributeBuilderSet
 //    
 //    private enum Action {

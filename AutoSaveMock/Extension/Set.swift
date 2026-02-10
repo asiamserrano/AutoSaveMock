@@ -54,26 +54,6 @@ extension Set where Element: Randomizable {
     
 }
 
-extension Set where Element == Attribute.Builder {
-    
-    public var propertyBuilderSet: PropertyBuilderSet {
-        self.map(\.properties).flatten
-    }
-    
-    public func filter(_ keyBuilder: Attribute.Enum.Builder) -> Self {
-        self.filtered { $0.keyBuilder == keyBuilder }
-    }
-    
-//    public var toAttributes: Game.Observer.Attributes {
-//        .init(uniqueKeysWithValues: self.keyBuilders.map { ($0, self.filter($0)) })
-//    }
-    
-    public var keyBuilders: Set<Attribute.Enum.Builder> {
-        self.mapped { $0.keyBuilder }
-    }
-        
-}
-
 /*
  extension Set {
      
